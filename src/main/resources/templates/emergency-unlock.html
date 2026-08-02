@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Emergency Unlock</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 2.5rem; border-radius: 12px; border: 1px solid #334155; width: 100%; max-width: 420px; }
+        h2 { color: #f43f5e; margin-top: 0; }
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: #cbd5e1; }
+        input { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #ffffff; box-sizing: border-box; }
+        .btn { width: 100%; padding: 0.75rem; background: #e11d48; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .alert { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem; }
+        .alert-error { background: #7f1d1d; color: #fca5a5; }
+        .alert-success { background: #14532d; color: #86efac; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Emergency Family Access</h2>
+        <p style="color: #94a3b8; font-size: 0.85rem;">Answering the security question correctly grants temporary family access. 3 incorrect attempts locks access for 24 hours[span_11](start_span)[span_11](end_span).</p>
+
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <form th:action="@{/auth/emergency-unlock}" method="post">
+            <div class="form-group">
+                <label>Account Owner Email</label>
+                <input type="email" name="email" required placeholder="owner@echovault.com">
+            </div>
+
+            <div class="form-group">
+                <label>Security Question Answer</label>
+                <input type="text" name="securityAnswer" required placeholder="Your answer...">
+            </div>
+
+            <button type="submit" class="btn">Verify Answer & Unlock</button>
+        </form>
+    </div>
+</body>
+</html>

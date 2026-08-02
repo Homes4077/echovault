@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault Admin — Live Presentation Controls</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+</head>
+<body>
+    <div class="navbar">
+        <a href="/admin/dashboard" class="navbar-brand">EchoVault Admin</a>
+        <div class="navbar-user">
+            <a href="/admin/dashboard" style="color: #cbd5e1; text-decoration: none;">Dashboard</a>
+            <a href="/admin/users" style="color: #cbd5e1; text-decoration: none;">User Monitor</a>
+            <a href="/admin/ghost-logs" style="color: #cbd5e1; text-decoration: none;">Ghost Logs</a>
+            <a href="/admin/demo" style="color: #38bdf8; text-decoration: none; font-weight: bold;">Demo Controls</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>Live Presentation & Demo Mode</h1>
+            <p style="color: #94a3b8;">Bypass background time intervals and trigger API dispatches instantly during project evaluation.</p>
+        </div>
+
+        <div class="demo-control-panel">
+            <h2>⚡ Quick API Triggers</h2>
+            <p style="color: #cbd5e1; font-size: 0.9rem;">Clicking these buttons bypasses scheduled cron wait times and immediately processes ready queues.</p>
+            
+            <div class="demo-btn-group">
+                <button onclick="triggerDemoDeliveries()" class="btn" style="background-color: #2ecc71;">
+                    📩 Dispatch Time-Locked Emails (SendGrid)
+                </button>
+                <button onclick="triggerDemoInactivity()" class="btn" style="background-color: #f39c12;">
+                    📱 Dispatch Inactivity Alerts (Twilio SMS)
+                </button>
+            </div>
+
+            <div id="demoOutput" style="margin-top: 1.5rem; padding: 1rem; background-color: #0f172a; border-radius: 6px; border: 1px solid #334155; font-family: monospace; color: #38bdf8; min-height: 50px;">
+                Ready for live demonstration...
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin-demo.js}"></script>
+</body>
+</html>

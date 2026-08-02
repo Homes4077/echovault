@@ -1,0 +1,79 @@
+/* Admin Dashboard Specific Layouts */
+.admin-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 1rem;
+}
+
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: #1e293b;
+    border-left: 4px solid #0284c7;
+    padding: 1.25rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-card h3 {
+    font-size: 2rem;
+    color: #38bdf8;
+    margin-bottom: 0.25rem;
+}
+
+.metric-card p {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.demo-control-panel {
+    background: linear-gradient(135deg, #1e293b 0%, #2a1b24 100%);
+    border: 1px solid #ef4444;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2.5rem;
+}
+
+.demo-control-panel h2 {
+    color: #fca5a5;
+    margin-bottom: 0.5rem;
+}
+
+.demo-btn-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.admin-table th, .admin-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+    font-size: 0.9rem;
+}
+
+.admin-table th {
+    background-color: #0f172a;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.status-success { color: #4ade80; font-weight: bold; }
+.status-failed { color: #f87171; font-weight: bold; }

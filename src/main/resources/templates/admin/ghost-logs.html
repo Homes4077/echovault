@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault Admin — Ghost Query Audit Logs</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+</head>
+<body>
+    <div class="navbar">
+        <a href="/admin/dashboard" class="navbar-brand">EchoVault Admin</a>
+        <div class="navbar-user">
+            <a href="/admin/dashboard" style="color: #cbd5e1; text-decoration: none;">Dashboard</a>
+            <a href="/admin/users" style="color: #cbd5e1; text-decoration: none;">User Monitor</a>
+            <a href="/admin/ghost-logs" style="color: #38bdf8; text-decoration: none; font-weight: bold;">Ghost Logs</a>
+            <a href="/admin/demo" style="color: #cbd5e1; text-decoration: none;">Demo Controls</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>Ghost Engine Audit Trail</h1>
+            <p style="color: #94a3b8;">Real-time inspection of family member queries and Gemini AI reconstruction responses.</p>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Log ID</th>
+                    <th>Vault Owner</th>
+                    <th>Queried By</th>
+                    <th>User Query</th>
+                    <th>Gemini Reconstructed Response</th>
+                    <th>Attributed Sources</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="q : ${ghostQueries}">
+                    <td th:text="${q.id}">101</td>
+                    <td th:text="${q.vaultOwner.fullName}">Owner Name</td>
+                    <td th:text="${q.queriedBy.fullName}">Family Member Name</td>
+                    <td style="font-weight: 600; color: #38bdf8;" th:text="${q.queryText}">What was your core life advice?</td>
+                    <td style="max-width: 300px; font-size: 0.85rem; color: #f1f5f9;" th:text="${q.responseText}">Response text...</td>
+                    <td>
+                        <span class="badge-tag badge-story" th:text="${q.sourcesUsed}">[VN-1, LT-3]</span>
+                    </td>
+                    <td th:text="${#temporals.format(q.queriedAt, 'yyyy-MM-dd HH:mm:ss')}">2026-08-02 12:00:00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EchoVault Admin & Monitoring Panel</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <style>
+        .admin-grid { display: flex; gap: 15px; margin-bottom: 25px; }
+        .card { flex: 1; background: #2c3e50; color: white; padding: 20px; border-radius: 6px; text-align: center; }
+        .demo-panel { background: #e74c3c; color: white; padding: 20px; border-radius: 6px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #34495e; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EchoVault System Monitoring & Admin Controls</h1>
+        <hr/>
+
+        <!-- LIVE DEMO PRESENTATION BUTTONS -->
+        <div class="demo-panel">
+            <h2>Live Presentation Demo Controls</h2>
+            <p>Bypass date/time waiting thresholds to demonstrate real-time API triggers during evaluation.</p>
+            <button onclick="triggerDemoDeliveries()" class="btn" style="background:#2ecc71;">Trigger Pending SendGrid Letters</button>
+            <button onclick="triggerDemoInactivity()" class="btn" style="background:#f39c12;">Trigger Twilio Inactivity Alerts</button>
+            <p id="demoOutput" style="font-weight: bold; margin-top: 10px;"></p>
+        </div>
+
+        <!-- SYSTEM METRICS -->
+        <div class="admin-grid">
+            <div class="card"><h3 th:text="${metrics.totalUsers}">0</h3><p>Users</p></div>
+            <div class="card"><h3 th:text="${metrics.totalVoiceNotes}">0</h3><p>Voice Notes</p></div>
+            <div class="card"><h3 th:text="${metrics.totalLetters}">0</h3><p>Letters</p></div>
+            <div class="card"><h3 th:text="${metrics.totalGhostQueries}">0</h3><p>Ghost Queries</p></div>
+        </div>
+
+        <!-- AUDIT LOG TABLE -->
+        <h2>Delivery Audit Trail</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Recipient</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="log : ${deliveryLogs}">
+                    <td th:text="${log.deliveryType}">SMS</td>
+                    <td th:text="${log.recipient}">+254...</td>
+                    <td th:text="${log.triggerReason}">LETTER</td>
+                    <td th:text="${log.status}">SUCCESS</td>
+                    <td th:text="${#temporals.format(log.deliveredAt, 'yyyy-MM-dd HH:mm')}">Time</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function triggerDemoDeliveries() {
+            fetch('/admin/demo/trigger-deliveries', { method: 'POST' })
+                .then(r => r.text())
+                .then(msg => document.getElementById('demoOutput').innerText = msg);
+        }
+        function triggerDemoInactivity() {
+            fetch('/admin/demo/trigger-inactivity', { method: 'POST' })
+                .then(r => r.text())
+                .then(msg => document.getElementById('demoOutput').innerText = msg);
+        }
+    </script>
+</body>
+</html>

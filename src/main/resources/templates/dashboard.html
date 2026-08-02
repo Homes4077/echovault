@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 0; }
+        .navbar { background: #1e293b; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .navbar h2 { margin: 0; color: #38bdf8; }
+        .main-container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .card { background: #1e293b; border-radius: 10px; padding: 1.5rem; border: 1px solid #334155; text-align: left; }
+        .card h3 { color: #f1f5f9; margin-top: 0; }
+        .card p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
+        .btn { display: inline-block; padding: 0.6rem 1.2rem; background: #0284c7; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 1rem; }
+        .btn:hover { background: #0369a1; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>EchoVault</h2>
+        <div>
+            <span style="margin-right: 15px; color: #94a3b8;">Welcome, <strong th:text="${user != null ? user.fullName : 'Account Owner'}">Owner</strong></span>
+            <a href="/auth/logout" style="color: #ef4444; text-decoration: none;">Logout</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1>Your Legacy Management Center</h1>
+        <p style="color: #94a3b8;">Record stories, compose time-locked messages, and configure emergency access triggers[span_2](start_span)[span_2](end_span).</p>
+
+        <div class="grid-cards">
+            <div class="card">
+                <h3>🎙️ Voice Memory Vault</h3>
+                <p>Record audio notes in real time. Automatically transcribed via AssemblyAI and tagged for your Ghost Engine[span_3](start_span)[span_3](end_span).</p>
+                <a href="/vault/record-voice" class="btn">Record Voice Note</a>
+            </div>
+
+            <div class="card">
+                <h3>✉️ Time-Locked Letters</h3>
+                <p>Write personalized letters scheduled for delivery on specific future dates via SendGrid[span_4](start_span)[span_4](end_span).</p>
+                <a href="/vault/write-letter" class="btn">Compose Letter</a>
+            </div>
+
+            <div class="card">
+                <h3>🤖 Ghost Reconstruction</h3>
+                <p>Test how your preserved words will respond to your family's questions using Gemini Flash AI[span_5](start_span)[span_5](end_span).</p>
+                <a href="/ghost/chat" class="btn">Test Ghost Engine</a>
+            </div>
+
+            <div class="card">
+                <h3>🕯️ Memorial Portal Page</h3>
+                <p>Preview your public legacy timeline, voice recordings, and curated media vault[span_6](start_span)[span_6](end_span).</p>
+                <a href="/memorial/preview" class="btn" style="background: #475569;">View Memorial</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

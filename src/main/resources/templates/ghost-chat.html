@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Ghost Engine Chat</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 750px; margin: auto; }
+        .chat-box { background: #1e293b; border-radius: 12px; border: 1px solid #334155; padding: 1.5rem; height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .msg { padding: 0.8rem 1.2rem; border-radius: 8px; max-width: 80%; line-height: 1.4; }
+        .msg-user { background: #0284c7; align-self: flex-end; color: white; }
+        .msg-ghost { background: #334155; align-self: flex-start; color: #f1f5f9; }
+        .source-tag { font-size: 0.75rem; color: #38bdf8; margin-top: 5px; display: block; }
+        .input-area { display: flex; gap: 10px; margin-top: 1rem; }
+        input { flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; }
+        button { padding: 0.8rem 1.5rem; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Consult Ghost Assistant Engine</h2>
+    <p style="color: #94a3b8;">Interrogates vault entries via Gemini Flash AI with strict ground-truth constraints[span_9](start_span)[span_9](end_span).</p>
+
+    <div class="chat-box" id="chatBox">
+        <div class="msg msg-ghost">
+            Hello. I am the EchoVault Assistant representing this vault's owner. Ask me anything about their preserved memories or advice[span_10](start_span)[span_10](end_span).
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask a question (e.g., What was your stance on hard work?)...">
+        <button onclick="sendQuery()">Ask Ghost</button>
+    </div>
+
+    <script>
+        function sendQuery() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            // Display User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'msg msg-user';
+            userDiv.innerText = text;
+            chatBox.appendChild(userDiv);
+
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Send query to Spring Controller
+            fetch('/ghost/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vaultOwnerId: 1,
+                    queriedById: 1,
+                    queryText: text
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                const ghostDiv = document.createElement('div');
+                ghostDiv.className = 'msg msg-ghost';
+                ghostDiv.innerText = data.responseText;
+
+                if (data.sourcesUsed) {
+                    const sourceSpan = document.createElement('span');
+                    sourceSpan.className = 'source-tag';
+                    sourceSpan.innerText = 'Sources: ' + data.sourcesUsed;
+                    ghostDiv.appendChild(sourceSpan);
+                }
+
+                chatBox.appendChild(ghostDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>

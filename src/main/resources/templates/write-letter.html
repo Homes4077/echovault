@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Write Time-Locked Letter</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 650px; margin: auto; }
+        .box { background: #1e293b; padding: 2rem; border-radius: 12px; border: 1px solid #334155; }
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.4rem; color: #cbd5e1; }
+        input, select, textarea { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        textarea { height: 150px; resize: vertical; }
+        .btn-save { background: #0284c7; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
+        #msg { margin-top: 15px; color: #4ade80; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Schedule Time-Locked Letter</h2>
+        <p style="color:#94a3b8;">This letter will be delivered via SendGrid automatically at the specified DateTime[span_8](start_span)[span_8](end_span).</p>
+
+        <div class="form-group">
+            <label>Recipient Name</label>
+            <input type="text" id="recipientName" placeholder="Jane Doe" required>
+        </div>
+
+        <div class="form-group">
+            <label>Recipient Email</label>
+            <input type="email" id="recipientEmail" placeholder="jane@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>Subject Line</label>
+            <input type="text" id="subject" placeholder="A message for your 25th birthday" required>
+        </div>
+
+        <div class="form-group">
+            <label>Tag Category</label>
+            <select id="tag">
+                <option value="MOTIVATIONAL">Motivational</option>
+                <option value="LOVE">Love</option>
+                <option value="STORY">Story</option>
+                <option value="WARNING">Warning</option>
+                <option value="FAITH">Faith</option>
+                <option value="CELEBRATION">Celebration</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Exact Delivery DateTime</label>
+            <input type="datetime-local" id="scheduledDeliveryAt" required>
+        </div>
+
+        <div class="form-group">
+            <label>Letter Content</label>
+            <textarea id="bodyContent" placeholder="Write your letter here..."></textarea>
+        </div>
+
+        <button onclick="scheduleLetter()" class="btn-save">Lock & Schedule Letter</button>
+        <div id="msg"></div>
+    </div>
+
+    <script>
+        function scheduleLetter() {
+            const payload = {
+                userId: 1, // Dynamically populated in live application
+                recipientName: document.getElementById('recipientName').value,
+                recipientEmail: document.getElementById('recipientEmail').value,
+                subject: document.getElementById('subject').value,
+                tag: document.getElementById('tag').value,
+                scheduledDeliveryAt: document.getElementById('scheduledDeliveryAt').value,
+                bodyContent: document.getElementById('bodyContent').value
+            };
+
+            fetch('/vault/letter/compose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.text())
+            .then(res => {
+                document.getElementById('msg').innerText = 'Letter scheduled successfully!';
+            });
+        }
+    </script>
+</body>
+</html>

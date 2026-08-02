@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Login</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-card { background: #1e293b; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; }
+        .login-card h1 { color: #38bdf8; margin-bottom: 0.5rem; font-size: 2rem; }
+        .login-card p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: #cbd5e1; }
+        .form-group input { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #ffffff; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 0.75rem; background: #0284c7; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #0369a1; }
+        .alert { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem; }
+        .alert-error { background: #7f1d1d; color: #fca5a5; }
+        .alert-info { background: #1e3a8a; color: #bfdbfe; }
+        .footer-links { margin-top: 1.5rem; font-size: 0.85rem; }
+        .footer-links a { color: #38bdf8; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>EchoVault</h1>
+        <p>Preserve your voice. Secure your legacy.</p>
+
+        <div th:if="${param.error}" class="alert alert-error">Invalid email or password.</div>
+        <div th:if="${param.logout}" class="alert alert-info">You have been logged out safely.</div>
+
+        <form th:action="@{/auth/login}" method="post">
+            <div class="form-group">
+                <label for="username">Email Address</label>
+                <input type="email" id="username" name="username" required autofocus placeholder="owner@echovault.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-submit">Sign In to Vault</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="/auth/emergency-unlock">Need Emergency Family Unlock?</a>
+        </div>
+    </div>
+</body>
+</html>

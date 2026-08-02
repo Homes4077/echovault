@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault — Voice Note Recorder</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 600px; margin: auto; }
+        .box { background: #1e293b; padding: 2rem; border-radius: 12px; border: 1px solid #334155; }
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.4rem; color: #cbd5e1; }
+        input, select { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .record-controls { text-align: center; margin: 1.5rem 0; }
+        .btn-rec { background: #ef4444; color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-stop { background: #64748b; color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; display: none; }
+        #status { font-weight: bold; margin-top: 10px; color: #38bdf8; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Record Voice Memory</h2>
+        <p style="color:#94a3b8;">Your recording will be sent to Cloudinary and transcribed by AssemblyAI[span_7](start_span)[span_7](end_span).</p>
+
+        <div class="form-group">
+            <label>Title / Identifier</label>
+            <input type="text" id="title" placeholder="e.g., Advice for my daughter's graduation" required>
+        </div>
+
+        <div class="form-group">
+            <label>Context Tag</label>
+            <select id="tag">
+                <option value="MOTIVATIONAL">Motivational</option>
+                <option value="LOVE">Love</option>
+                <option value="STORY">Story</option>
+                <option value="WARNING">Warning</option>
+                <option value="FAITH">Faith</option>
+                <option value="CELEBRATION">Celebration</option>
+            </select>
+        </div>
+
+        <div class="record-controls">
+            <button id="startBtn" class="btn-rec" onclick="startRecording()">🔴 Start Recording</button>
+            <button id="stopBtn" class="btn-stop" onclick="stopRecording()">⏹️ Stop & Save</button>
+        </div>
+
+        <div id="status">Ready</div>
+        <audio id="audioPlayback" controls style="width: 100%; margin-top: 15px; display: none;"></audio>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = uploadAudio;
+
+            mediaRecorder.start();
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('status').innerText = 'Recording in progress...';
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('status').innerText = 'Processing & Transcribing...';
+        }
+
+        function uploadAudio() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('userId', '1'); // Replace dynamically in real app
+            formData.append('title', document.getElementById('title').value || 'Untitled Note');
+            formData.append('tag', document.getElementById('tag').value);
+            formData.append('file', audioBlob, 'recording.wav');
+
+            fetch('/vault/voice/upload', { method: 'POST', body: formData })
+                .then(r => r.text())
+                .then(res => {
+                    document.getElementById('status').innerText = 'Saved & Transcribed successfully!';
+                })
+                .catch(() => {
+                    document.getElementById('status').innerText = 'Error saving recording.';
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoVault Admin — User Monitoring</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+</head>
+<body>
+    <div class="navbar">
+        <a href="/admin/dashboard" class="navbar-brand">EchoVault Admin</a>
+        <div class="navbar-user">
+            <a href="/admin/dashboard" style="color: #cbd5e1; text-decoration: none;">Dashboard</a>
+            <a href="/admin/users" style="color: #38bdf8; text-decoration: none; font-weight: bold;">User Monitor</a>
+            <a href="/admin/ghost-logs" style="color: #cbd5e1; text-decoration: none;">Ghost Logs</a>
+            <a href="/admin/demo" style="color: #cbd5e1; text-decoration: none;">Demo Controls</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>User Account & Inactivity Monitor</h1>
+            <p style="color: #94a3b8;">Track registered account owners, last login timestamps, and emergency lockout statuses.</p>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Last Active</th>
+                    <th>Threshold</th>
+                    <th>Alert Status</th>
+                    <th>Lock Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.id}">1</td>
+                    <td th:text="${u.fullName}">JohnMark Gitahi</td>
+                    <td th:text="${u.email}">owner@echovault.com</td>
+                    <td>
+                        <span class="badge-tag" 
+                              th:classappend="${u.role.name() == 'ROLE_ADMIN' ? 'badge-warning' : 'badge-motivational'}" 
+                              th:text="${u.role}">ROLE_ACCOUNT_OWNER</span>
+                    </td>
+                    <td th:text="${#temporals.format(u.lastLoginAt, 'yyyy-MM-dd HH:mm')}">2026-08-01 10:00</td>
+                    <td th:text="${u.inactivityThresholdDays + ' Days'}">30 Days</td>
+                    <td>
+                        <span th:if="${u.inactivityAlertSent}" class="status-failed">ALERT SENT</span>
+                        <span th:unless="${u.inactivityAlertSent}" class="status-success">ACTIVE / OK</span>
+                    </td>
+                    <td>
+                        <span th:if="${u.lockedUntil != null && u.lockedUntil.isAfter(#temporals.createNow())}" 
+                              class="status-failed" 
+                              th:text="'LOCKED until ' + ${#temporals.format(u.lockedUntil, 'HH:mm')}">LOCKED</span>
+                        <span th:unless="${u.lockedUntil != null && u.lockedUntil.isAfter(#temporals.createNow())}" 
+                              class="status-success">UNLOCKED</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
