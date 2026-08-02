@@ -1,48 +1,37 @@
 package com.echovault.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String fullName;
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String passwordHash;
+    private String password;
 
-    @Column(nullable = false)
-    private String phoneNumber;
+    private LocalDateTime createdAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.ROLE_ACCOUNT_OWNER;
-
-    private LocalDateTime lastLoginAt = LocalDateTime.now();
-    private Integer inactivityThresholdDays = 30;
-    private Boolean inactivityAlertSent = false;
-
-    private String securityQuestion;
-    private String securityAnswerHash;
-    private Integer failedUnlockAttempts = 0;
-    private LocalDateTime lockedUntil;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    public enum Role {
-        ROLE_ADMIN, ROLE_ACCOUNT_OWNER, ROLE_FAMILY_MEMBER
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

@@ -1,14 +1,19 @@
 package com.echovault.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "ghost_queries")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "ghost_queries")
 public class GhostQuery {
 
     @Id
@@ -16,21 +21,25 @@ public class GhostQuery {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vault_owner_id", nullable = false)
+    @JoinColumn(name = "vault_owner_id")
     private User vaultOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "queried_by_id", nullable = false)
+    @JoinColumn(name = "queried_by_id")
     private User queriedBy;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String queryText;
 
-    @Column(columnDefinition = "LONGTEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String responseText;
 
-    @Column(columnDefinition = "TEXT")
     private String sourcesUsed;
 
-    private LocalDateTime queriedAt = LocalDateTime.now();
+    private LocalDateTime queriedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.queriedAt = LocalDateTime.now();
+    }
 }
