@@ -1,45 +1,43 @@
 package com.echovault.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "letters")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "letters")
 public class Letter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(nullable = false)
-    private String recipientEmail;
-
-    @Column(nullable = false)
     private String recipientName;
-
-    @Column(nullable = false)
+    private String recipientEmail;
     private String subject;
 
-    @Column(columnDefinition = "LONGTEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String bodyContent;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private VoiceNote.Tag tag;
+    private String tag;
 
-    @Column(nullable = false)
     private LocalDateTime scheduledDeliveryAt;
+    private LocalDateTime createdAt;
 
-    private Boolean isDelivered = false;
-    private LocalDateTime deliveredAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
