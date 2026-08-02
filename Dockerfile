@@ -1,24 +1,24 @@
-# Stage 1: Build JAR using Maven & JDK 17
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# --- Stage 1: Build Stage ---
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Cache dependencies
+# Step 1: Copy pom.xml and download dependencies (cached layer)
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source code and build package
+# Step 2: Copy source code and package the app
 COPY src ./src
 RUN mvn package -DskipTests
 
-# Stage 2: Minimal Runtime Environment
+# --- Stage 2: Runtime Stage ---
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy compiled JAR from build stage
-COPY --from=build /app/target/echovault-1.0.0.jar app.jar
+# Step 3: Copy the compiled JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Expose HTTP Port
+# Step 4: Expose application port (adjust if using a port other than 8080)
 EXPOSE 8080
 
-# Run Spring Boot Application
+# Step 5: Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
