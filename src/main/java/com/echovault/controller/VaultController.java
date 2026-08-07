@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/vault")
+@RequestMapping("/api/v1/vault")
 public class VaultController {
 
     private final LetterRepository letterRepository;
@@ -63,14 +63,25 @@ public class VaultController {
             @RequestPart("file") MultipartFile file,
             @RequestPart("data") VoiceUploadDto dto) throws IOException {
 
-        Map uploadResult = cloudinaryService.uploadFile(file);
-        
+        Map<?, ?> uploadResult = cloudinaryService.uploadFile(file);
+
+        VoiceNote.Tag noteTag = VoiceNote.Tag.PERSONAL;
+        if (dto.getTag() != null) {
+            try {
+                noteTag = VoiceNote.Tag.valueOf(dto.getTag().trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                // Fallbacks to default Tag.PERSONAL on mismatch
+            }
+        }
+
+        VoiceNote.Tag finalTag = noteTag;
+
         return userRepository.findById(dto.getUserId())
             .map(user -> {
                 VoiceNote voiceNote = VoiceNote.builder()
                     .user(user)
                     .title(dto.getTitle())
-                    .tag(dto.getTag())
+                    .tag(finalTag)
                     .cloudinaryUrl(uploadResult.get("secure_url").toString())
                     .cloudinaryPublicId(uploadResult.get("public_id").toString())
                     .transcriptionStatus(VoiceNote.TranscriptionStatus.PENDING)

@@ -1,15 +1,17 @@
 package com.echovault.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "letters")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "letters")
 public class Letter {
 
     @Id
@@ -17,7 +19,8 @@ public class Letter {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     private String recipientName;
@@ -34,4 +37,11 @@ public class Letter {
     private Boolean isDelivered = false;
 
     private LocalDateTime deliveredAt;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

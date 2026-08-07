@@ -1,11 +1,17 @@
 package com.echovault.dto;
 
-import com.echovault.model.VoiceNote;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class VoiceUploadDto {
+
     private Long userId;
     private String title;
-    private VoiceNote.Tag tag;
+    private String tag;
 }

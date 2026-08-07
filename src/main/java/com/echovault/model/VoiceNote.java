@@ -1,7 +1,10 @@
 package com.echovault.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "voice_notes")
@@ -17,6 +20,7 @@ public class VoiceNote {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     private String title;
@@ -32,6 +36,13 @@ public class VoiceNote {
 
     @Enumerated(EnumType.STRING)
     private TranscriptionStatus transcriptionStatus;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public enum Tag {
         MEMORY, ADVICE, LEGAL, PERSONAL, GREETING
