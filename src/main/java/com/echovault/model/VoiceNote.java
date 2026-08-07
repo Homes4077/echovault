@@ -2,13 +2,13 @@ package com.echovault.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "voice_notes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class VoiceNote {
 
     @Id
@@ -16,30 +16,28 @@ public class VoiceNote {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String cloudinaryUrl;
+    @Enumerated(EnumType.STRING)
+    private Tag tag;
 
-    @Column(nullable = false)
+    private String cloudinaryUrl;
     private String cloudinaryPublicId;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String transcription;
 
     @Enumerated(EnumType.STRING)
-    private TranscriptionStatus transcriptionStatus = TranscriptionStatus.PENDING;
+    private TranscriptionStatus transcriptionStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Tag tag;
+    public enum Tag {
+        MEMORY, ADVICE, LEGAL, PERSONAL, GREETING
+    }
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    public enum TranscriptionStatus { PENDING, COMPLETED, FAILED }
-    public enum Tag { MOTIVATIONAL, LOVE, STORY, WARNING, FAITH, CELEBRATION }
+    public enum TranscriptionStatus {
+        PENDING, COMPLETED, FAILED
+    }
 }

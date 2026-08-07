@@ -1,19 +1,15 @@
 package com.echovault.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "ghost_queries")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "ghost_queries")
 public class GhostQuery {
 
     @Id
@@ -31,15 +27,6 @@ public class GhostQuery {
     @Column(columnDefinition = "TEXT")
     private String queryText;
 
-    @Column(columnDefinition = "TEXT")
-    private String responseText;
-
-    private String sourcesUsed;
-
-    private LocalDateTime queriedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.queriedAt = LocalDateTime.now();
-    }
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

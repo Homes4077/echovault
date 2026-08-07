@@ -1,24 +1,32 @@
-# --- Stage 1: Build Stage ---
-FROM maven:3.9-eclipse-temurin-17 AS build
+# ==========================================
+# Build Stage
+# ==========================================
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+
 WORKDIR /app
 
-# Step 1: Copy pom.xml and download dependencies (cached layer)
+# Copy dependency definition to leverage Docker layer caching
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Step 2: Copy source code and package the app
+# Copy source files and build the jar
 COPY src ./src
-RUN mvn package -DskipTests
+RUN mvn clean package -DskipTests
 
-# --- Stage 2: Runtime Stage ---
+# ==========================================
+# Run Stage
+# ==========================================
 FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /app
 
-# Step 3: Copy the compiled JAR from the build stage
-COPY --from=build /app/target/*.jar app.jar
+# Create a non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
-# Step 4: Expose application port (adjust if using a port other than 8080)
+# Copy the built JAR file from the builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Step 5: Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]

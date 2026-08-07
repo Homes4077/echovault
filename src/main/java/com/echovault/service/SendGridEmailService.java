@@ -1,31 +1,31 @@
 package com.echovault.service;
 
-import com.sendgrid.*;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 
 @Service
 public class SendGridEmailService {
 
-    @Value("${spring.sendgrid.api-key}")
-    private String sendGridApiKey;
+    @Value("${sendgrid.api-key}")
+    private String apiKey;
 
-    @Value("${echovault.email.sender}")
-    private String senderEmail;
+    public boolean sendEmail(String toEmail, String subject, String body) {
+        Email from = new Email("noreply@echovault.com");
+        Email to = new Email(toEmail);
+        Content content = new Content("text/plain", body);
+        Mail mail = new Mail(from, subject, to, content);
 
-    public boolean sendEmail(String recipientEmail, String subjectText, String bodyText) {
-        Email from = new Email(senderEmail, "EchoVault Legacy System");
-        Email to = new Email(recipientEmail);
-        Content content = new Content("text/html", bodyText);
-        Mail mail = new Mail(from, subjectText, to, content);
-
-        SendGrid sg = new SendGrid(sendGridApiKey);
+        SendGrid sg = new SendGrid(apiKey);
         Request request = new Request();
-
         try {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");

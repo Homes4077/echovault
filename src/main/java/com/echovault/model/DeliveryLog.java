@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DeliveryLog {
 
     @Id
@@ -16,28 +17,26 @@ public class DeliveryLog {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private DeliveryType deliveryType;
 
-    @Column(nullable = false)
     private String recipient;
-
-    @Column(nullable = false)
     private String triggerReason;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Status status;
 
-    @Column(columnDefinition = "TEXT")
-    private String errorMessage;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime deliveredAt = LocalDateTime.now();
+    public enum DeliveryType {
+        EMAIL, SMS, SENDGRID_EMAIL, TWILIO_SMS
+    }
 
-    public enum DeliveryType { SENDGRID_EMAIL, TWILIO_SMS }
-    public enum Status { SUCCESS, FAILED, DEMO_TRIGGERED }
+    public enum Status {
+        SENT, FAILED, SUCCESS
+    }
 }

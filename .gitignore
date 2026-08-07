@@ -18,6 +18,3 @@ target/
 # System files
 .DS_Store
 Thumbs.db
-src/main/resources/application-local.properties
-.env
-target/

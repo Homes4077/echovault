@@ -1,0 +1,562 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.echovault:echovault >-----------------------
+[INFO] Building echovault 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ echovault ---
+[INFO] Deleting /storage/emulated/0/Echos/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ echovault ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 17 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ echovault ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 38 source files with javac [debug release 17] to target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/dto/​VoiceUploadDto.java:[8,8] class VoiceUploadDto is public, should be declared in a file named VoiceUploadDto.java
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[4,33] package com.sendgrid.helpers.mail does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[5,41] package com.sendgrid.helpers.mail.objects does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[6,41] package com.sendgrid.helpers.mail.objects does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[3,18] package com.twilio does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[4,41] package com.twilio.rest.api.v2010.account does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[5,23] package com.twilio.type does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[3,1] package com.sendgrid does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[3,22] package com.cloudinary does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[4,28] package com.cloudinary.utils does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[15,13] cannot find symbol
+  symbol:   class Cloudinary
+  location: class com.echovault.service.CloudinaryService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[3,22] package com.cloudinary does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[4,28] package com.cloudinary.utils does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[22,12] cannot find symbol
+  symbol:   class Cloudinary
+  location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[5,67] package org.springframework.security.config.annotation.web.builders does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[6,72] package org.springframework.security.config.annotation.web.configuration does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[7,50] package org.springframework.security.crypto.bcrypt does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[8,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[9,40] package org.springframework.security.web does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[12,2] cannot find symbol
+  symbol: class EnableWebSecurity
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[16,12] cannot find symbol
+  symbol:   class PasswordEncoder
+  location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[21,44] cannot find symbol
+  symbol:   class HttpSecurity
+  location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[21,12] cannot find symbol
+  symbol:   class SecurityFilterChain
+  location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/AuthController.java:[7,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/AuthController.java:[18,24] cannot find symbol
+  symbol:   class PasswordEncoder
+  location: class com.echovault.controller.AuthController
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[35,23] cannot find symbol
+  symbol:   method getRecipientEmail()
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[36,23] cannot find symbol
+  symbol:   method getSubject()
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[37,23] cannot find symbol
+  symbol:   method getBodyContent()
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[40,19] cannot find symbol
+  symbol:   method setIsDelivered(boolean)
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[41,19] cannot find symbol
+  symbol:   method setDeliveredAt(java.time.LocalDateTime)
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[45,31] cannot find symbol
+  symbol:   method getUser()
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[46,16] cannot find symbol
+  symbol:   method setDeliveryType(com.echovault.model.DeliveryLog.DeliveryType)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[47,36] cannot find symbol
+  symbol:   method getRecipientEmail()
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[48,16] cannot find symbol
+  symbol:   method setTriggerReason(java.lang.String)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[49,16] cannot find symbol
+  symbol:   method setStatus(sent ? Del[...]AILED)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[21,9] cannot find symbol
+  symbol:   class Email
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[21,26] cannot find symbol
+  symbol:   class Email
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[22,9] cannot find symbol
+  symbol:   class Email
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[22,24] cannot find symbol
+  symbol:   class Email
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[23,9] cannot find symbol
+  symbol:   class Content
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[23,31] cannot find symbol
+  symbol:   class Content
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[24,9] cannot find symbol
+  symbol:   class Mail
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[24,25] cannot find symbol
+  symbol:   class Mail
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[26,9] cannot find symbol
+  symbol:   class SendGrid
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[26,27] cannot find symbol
+  symbol:   class SendGrid
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[27,9] cannot find symbol
+  symbol:   class Request
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[27,31] cannot find symbol
+  symbol:   class Request
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[30,31] cannot find symbol
+  symbol:   variable Method
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[33,13] cannot find symbol
+  symbol:   class Response
+  location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[24,9] cannot find symbol
+  symbol:   variable Twilio
+  location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[30,21] cannot find symbol
+  symbol:   class PhoneNumber
+  location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[31,21] cannot find symbol
+  symbol:   class PhoneNumber
+  location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[29,13] cannot find symbol
+  symbol:   variable Message
+  location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[40,13] cannot find symbol
+  symbol:   method setUser(com.echovault.model.User)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[41,13] cannot find symbol
+  symbol:   method setTitle(java.lang.String)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[42,13] cannot find symbol
+  symbol:   method setTag(com.echovault.model.VoiceNote.Tag)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[43,13] cannot find symbol
+  symbol:   method setCloudinaryUrl(java.lang.String)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[44,13] cannot find symbol
+  symbol:   method setCloudinaryPublicId(java.lang.String)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[45,13] cannot find symbol
+  symbol:   method setTranscription(java.lang.String)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[46,13] cannot find symbol
+  symbol:   method setTranscriptionStatus(com.echovault.model.VoiceNote.TranscriptionStatus)
+  location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[55,48] cannot find symbol
+  symbol:   method getUserId()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[58,15] cannot find symbol
+  symbol:   method setUser(com.echovault.model.User)
+  location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[59,36] cannot find symbol
+  symbol:   method getRecipientName()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[60,37] cannot find symbol
+  symbol:   method getRecipientEmail()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[61,30] cannot find symbol
+  symbol:   method getSubject()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[62,34] cannot find symbol
+  symbol:   method getBodyContent()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[63,26] cannot find symbol
+  symbol:   method getTag()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[64,42] cannot find symbol
+  symbol:   method getScheduledDeliveryAt()
+  location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[20,13] cannot find symbol
+  symbol:   variable ObjectUtils
+  location: class com.echovault.service.CloudinaryService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[31,73] cannot find symbol
+  symbol:   method getInactivityThresholdDays()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[33,21] cannot find symbol
+  symbol:   method getLastLoginAt()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[33,67] cannot find symbol
+  symbol:   method getInactivityAlertSent()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[35,25] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[39,187] cannot find symbol
+  symbol:   method getFullName()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[39,207] cannot find symbol
+  symbol:   method getInactivityThresholdDays()
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[41,68] cannot find symbol
+  symbol:   method getPhoneNumber()
+  location: variable contact of type com.echovault.model.FamilyMember
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[44,24] cannot find symbol
+  symbol:   method setUser(com.echovault.model.User)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[45,24] cannot find symbol
+  symbol:   method setDeliveryType(com.echovault.model.DeliveryLog.DeliveryType)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[46,45] cannot find symbol
+  symbol:   method getPhoneNumber()
+  location: variable contact of type com.echovault.model.FamilyMember
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[47,24] cannot find symbol
+  symbol:   method setTriggerReason(java.lang.String)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[48,24] cannot find symbol
+  symbol:   method setStatus(sent ? Del[...]AILED)
+  location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[52,21] cannot find symbol
+  symbol:   method setInactivityAlertSent(boolean)
+  location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[23,20] cannot find symbol
+  symbol:   class Cloudinary
+  location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[23,31] cannot find symbol
+  symbol:   variable ObjectUtils
+  location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[26,54] cannot find symbol
+  symbol:   method getVaultOwnerId()
+  location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[27,53] cannot find symbol
+  symbol:   method getQueriedById()
+  location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[33,81] cannot find symbol
+  symbol:   method getId()
+  location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[35,19] cannot find symbol
+  symbol:   method getTranscription()
+  location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[36,55] cannot find symbol
+  symbol:   method getTag()
+  location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[36,77] cannot find symbol
+  symbol:   method getTranscription()
+  location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[37,41] cannot find symbol
+  symbol:   method getId()
+  location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[41,72] cannot find symbol
+  symbol:   method getId()
+  location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[43,46] cannot find symbol
+  symbol:   method getTag()
+  location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[43,67] cannot find symbol
+  symbol:   method getBodyContent()
+  location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[44,36] cannot find symbol
+  symbol:   method getId()
+  location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[49,23] cannot find symbol
+  symbol:   method getFullName()
+  location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[51,16] cannot find symbol
+  symbol:   method getQueryText()
+  location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[56,17] cannot find symbol
+  symbol:   method setVaultOwner(com.echovault.model.User)
+  location: variable queryLog of type com.echovault.model.GhostQuery
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[57,17] cannot find symbol
+  symbol:   method setQueriedBy(com.echovault.model.User)
+  location: variable queryLog of type com.echovault.model.GhostQuery
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[58,34] cannot find symbol
+  symbol:   method getQueryText()
+  location: variable dto of type com.echovault.dto.GhostQueryDto
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11.906 s
+[INFO] Finished at: 2026-08-02T17:39:08Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project echovault: Compilation failure: Compilation failure: 
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/dto/​VoiceUploadDto.java:[8,8] class VoiceUploadDto is public, should be declared in a file named VoiceUploadDto.java
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[4,33] package com.sendgrid.helpers.mail does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[5,41] package com.sendgrid.helpers.mail.objects does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[6,41] package com.sendgrid.helpers.mail.objects does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[3,18] package com.twilio does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[4,41] package com.twilio.rest.api.v2010.account does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[5,23] package com.twilio.type does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[3,1] package com.sendgrid does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[3,22] package com.cloudinary does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[4,28] package com.cloudinary.utils does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[15,13] cannot find symbol
+[ERROR]   symbol:   class Cloudinary
+[ERROR]   location: class com.echovault.service.CloudinaryService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[3,22] package com.cloudinary does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[4,28] package com.cloudinary.utils does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[22,12] cannot find symbol
+[ERROR]   symbol:   class Cloudinary
+[ERROR]   location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[5,67] package org.springframework.security.config.annotation.web.builders does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[6,72] package org.springframework.security.config.annotation.web.configuration does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[7,50] package org.springframework.security.crypto.bcrypt does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[8,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[9,40] package org.springframework.security.web does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[12,2] cannot find symbol
+[ERROR]   symbol: class EnableWebSecurity
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[16,12] cannot find symbol
+[ERROR]   symbol:   class PasswordEncoder
+[ERROR]   location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[21,44] cannot find symbol
+[ERROR]   symbol:   class HttpSecurity
+[ERROR]   location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/SecurityConfig.java:[21,12] cannot find symbol
+[ERROR]   symbol:   class SecurityFilterChain
+[ERROR]   location: class com.echovault.config.SecurityConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/AuthController.java:[7,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/AuthController.java:[18,24] cannot find symbol
+[ERROR]   symbol:   class PasswordEncoder
+[ERROR]   location: class com.echovault.controller.AuthController
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[35,23] cannot find symbol
+[ERROR]   symbol:   method getRecipientEmail()
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[36,23] cannot find symbol
+[ERROR]   symbol:   method getSubject()
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[37,23] cannot find symbol
+[ERROR]   symbol:   method getBodyContent()
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[40,19] cannot find symbol
+[ERROR]   symbol:   method setIsDelivered(boolean)
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[41,19] cannot find symbol
+[ERROR]   symbol:   method setDeliveredAt(java.time.LocalDateTime)
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[45,31] cannot find symbol
+[ERROR]   symbol:   method getUser()
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[46,16] cannot find symbol
+[ERROR]   symbol:   method setDeliveryType(com.echovault.model.DeliveryLog.DeliveryType)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[47,36] cannot find symbol
+[ERROR]   symbol:   method getRecipientEmail()
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[48,16] cannot find symbol
+[ERROR]   symbol:   method setTriggerReason(java.lang.String)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/DeliveryScheduler.java:[49,16] cannot find symbol
+[ERROR]   symbol:   method setStatus(sent ? Del[...]AILED)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[21,9] cannot find symbol
+[ERROR]   symbol:   class Email
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[21,26] cannot find symbol
+[ERROR]   symbol:   class Email
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[22,9] cannot find symbol
+[ERROR]   symbol:   class Email
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[22,24] cannot find symbol
+[ERROR]   symbol:   class Email
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[23,9] cannot find symbol
+[ERROR]   symbol:   class Content
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[23,31] cannot find symbol
+[ERROR]   symbol:   class Content
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[24,9] cannot find symbol
+[ERROR]   symbol:   class Mail
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[24,25] cannot find symbol
+[ERROR]   symbol:   class Mail
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[26,9] cannot find symbol
+[ERROR]   symbol:   class SendGrid
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[26,27] cannot find symbol
+[ERROR]   symbol:   class SendGrid
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[27,9] cannot find symbol
+[ERROR]   symbol:   class Request
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[27,31] cannot find symbol
+[ERROR]   symbol:   class Request
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[30,31] cannot find symbol
+[ERROR]   symbol:   variable Method
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/SendGridEmailService.java:[33,13] cannot find symbol
+[ERROR]   symbol:   class Response
+[ERROR]   location: class com.echovault.service.SendGridEmailService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[24,9] cannot find symbol
+[ERROR]   symbol:   variable Twilio
+[ERROR]   location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[30,21] cannot find symbol
+[ERROR]   symbol:   class PhoneNumber
+[ERROR]   location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[31,21] cannot find symbol
+[ERROR]   symbol:   class PhoneNumber
+[ERROR]   location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/TwilioSmsService.java:[29,13] cannot find symbol
+[ERROR]   symbol:   variable Message
+[ERROR]   location: class com.echovault.service.TwilioSmsService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[40,13] cannot find symbol
+[ERROR]   symbol:   method setUser(com.echovault.model.User)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[41,13] cannot find symbol
+[ERROR]   symbol:   method setTitle(java.lang.String)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[42,13] cannot find symbol
+[ERROR]   symbol:   method setTag(com.echovault.model.VoiceNote.Tag)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[43,13] cannot find symbol
+[ERROR]   symbol:   method setCloudinaryUrl(java.lang.String)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[44,13] cannot find symbol
+[ERROR]   symbol:   method setCloudinaryPublicId(java.lang.String)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[45,13] cannot find symbol
+[ERROR]   symbol:   method setTranscription(java.lang.String)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[46,13] cannot find symbol
+[ERROR]   symbol:   method setTranscriptionStatus(com.echovault.model.VoiceNote.TranscriptionStatus)
+[ERROR]   location: variable note of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[55,48] cannot find symbol
+[ERROR]   symbol:   method getUserId()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[58,15] cannot find symbol
+[ERROR]   symbol:   method setUser(com.echovault.model.User)
+[ERROR]   location: variable letter of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[59,36] cannot find symbol
+[ERROR]   symbol:   method getRecipientName()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[60,37] cannot find symbol
+[ERROR]   symbol:   method getRecipientEmail()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[61,30] cannot find symbol
+[ERROR]   symbol:   method getSubject()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[62,34] cannot find symbol
+[ERROR]   symbol:   method getBodyContent()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[63,26] cannot find symbol
+[ERROR]   symbol:   method getTag()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/VaultController.java:[64,42] cannot find symbol
+[ERROR]   symbol:   method getScheduledDeliveryAt()
+[ERROR]   location: variable dto of type com.echovault.dto.LetterRequestDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/service/CloudinaryService.java:[20,13] cannot find symbol
+[ERROR]   symbol:   variable ObjectUtils
+[ERROR]   location: class com.echovault.service.CloudinaryService
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[31,73] cannot find symbol
+[ERROR]   symbol:   method getInactivityThresholdDays()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[33,21] cannot find symbol
+[ERROR]   symbol:   method getLastLoginAt()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[33,67] cannot find symbol
+[ERROR]   symbol:   method getInactivityAlertSent()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[35,25] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[39,187] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[39,207] cannot find symbol
+[ERROR]   symbol:   method getInactivityThresholdDays()
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[41,68] cannot find symbol
+[ERROR]   symbol:   method getPhoneNumber()
+[ERROR]   location: variable contact of type com.echovault.model.FamilyMember
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[44,24] cannot find symbol
+[ERROR]   symbol:   method setUser(com.echovault.model.User)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[45,24] cannot find symbol
+[ERROR]   symbol:   method setDeliveryType(com.echovault.model.DeliveryLog.DeliveryType)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[46,45] cannot find symbol
+[ERROR]   symbol:   method getPhoneNumber()
+[ERROR]   location: variable contact of type com.echovault.model.FamilyMember
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[47,24] cannot find symbol
+[ERROR]   symbol:   method setTriggerReason(java.lang.String)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[48,24] cannot find symbol
+[ERROR]   symbol:   method setStatus(sent ? Del[...]AILED)
+[ERROR]   location: variable log of type com.echovault.model.DeliveryLog
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/scheduler/InactivityScheduler.java:[52,21] cannot find symbol
+[ERROR]   symbol:   method setInactivityAlertSent(boolean)
+[ERROR]   location: variable user of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[23,20] cannot find symbol
+[ERROR]   symbol:   class Cloudinary
+[ERROR]   location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/config/CloudinaryConfig.java:[23,31] cannot find symbol
+[ERROR]   symbol:   variable ObjectUtils
+[ERROR]   location: class com.echovault.config.CloudinaryConfig
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[26,54] cannot find symbol
+[ERROR]   symbol:   method getVaultOwnerId()
+[ERROR]   location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[27,53] cannot find symbol
+[ERROR]   symbol:   method getQueriedById()
+[ERROR]   location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[33,81] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[35,19] cannot find symbol
+[ERROR]   symbol:   method getTranscription()
+[ERROR]   location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[36,55] cannot find symbol
+[ERROR]   symbol:   method getTag()
+[ERROR]   location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[36,77] cannot find symbol
+[ERROR]   symbol:   method getTranscription()
+[ERROR]   location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[37,41] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable vn of type com.echovault.model.VoiceNote
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[41,72] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[43,46] cannot find symbol
+[ERROR]   symbol:   method getTag()
+[ERROR]   location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[43,67] cannot find symbol
+[ERROR]   symbol:   method getBodyContent()
+[ERROR]   location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[44,36] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable l of type com.echovault.model.Letter
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[49,23] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable vaultOwner of type com.echovault.model.User
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[51,16] cannot find symbol
+[ERROR]   symbol:   method getQueryText()
+[ERROR]   location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[56,17] cannot find symbol
+[ERROR]   symbol:   method setVaultOwner(com.echovault.model.User)
+[ERROR]   location: variable queryLog of type com.echovault.model.GhostQuery
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[57,17] cannot find symbol
+[ERROR]   symbol:   method setQueriedBy(com.echovault.model.User)
+[ERROR]   location: variable queryLog of type com.echovault.model.GhostQuery
+[ERROR] /storage/emulated/0/Echos/src/main/java/com/echovault/controller/GhostEngineController.java:[58,34] cannot find symbol
+[ERROR]   symbol:   method getQueryText()
+[ERROR]   location: variable dto of type com.echovault.dto.GhostQueryDto
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

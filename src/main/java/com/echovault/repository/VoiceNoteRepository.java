@@ -6,5 +6,4 @@ import java.util.List;
 
 public interface VoiceNoteRepository extends JpaRepository<VoiceNote, Long> {
     List<VoiceNote> findByUserId(Long userId);
-    List<VoiceNote> findByUserIdAndTag(Long userId, VoiceNote.Tag tag);
 }
