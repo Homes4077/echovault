@@ -1,8 +1,10 @@
 package com.echovault.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -19,8 +21,7 @@ public class Letter {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
+    @JoinColumn(name = "user_id")
     private User user;
 
     private String recipientName;
@@ -32,16 +33,6 @@ public class Letter {
 
     private String tag;
     private LocalDateTime scheduledDeliveryAt;
-
-    @Builder.Default
-    private Boolean isDelivered = false;
-
+    private boolean isDelivered;
     private LocalDateTime deliveredAt;
-
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

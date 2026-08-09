@@ -2,17 +2,12 @@ package com.echovault.repository;
 
 import com.echovault.model.Letter;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface LetterRepository extends JpaRepository<Letter, Long> {
-    List<Letter> findByUserId(Long userId);
-    
-    List<Letter> findByIsDeliveredFalseAndScheduledDeliveryAtBefore(LocalDateTime now);
-
-    @Query("SELECT l FROM Letter l WHERE l.isDelivered = false AND l.scheduledDeliveryAt <= :now")
-    List<Letter> findPendingLettersToDeliver(@Param("now") LocalDateTime now);
+    List<Letter> findAllByIsDeliveredFalseAndScheduledDeliveryAtBefore(LocalDateTime time);
 }

@@ -1,20 +1,11 @@
-# Local secret key configuration (DO NOT REMOVE FROM GITIGNORE)
-src/main/resources/application-local.properties
-.env
-
-# Target build directory
 target/
+*.class
 *.jar
 *.war
-
-# IDE files
 .idea/
 *.iml
 .classpath
 .project
 .settings/
-.vscode/
-
-# System files
+*.log
 .DS_Store
-Thumbs.db

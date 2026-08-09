@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault - Vault Archive</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; min-height: 100vh; padding: 2rem 1rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .brand { color: #0ea5e9; font-weight: 700; text-decoration: none; }
+        .title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .subtitle { color: #94a3b8; margin-bottom: 2rem; }
+        .section-title { font-size: 1.2rem; color: #0ea5e9; margin: 1.5rem 0 1rem 0; font-weight: 600; }
+        .item-card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .badge { background: rgba(14, 165, 233, 0.2); color: #38bdf8; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .item-title { font-size: 1.1rem; font-weight: 600; }
+        .item-body { color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin-top: 0.5rem; }
+        .meta { color: #64748b; font-size: 0.8rem; margin-top: 0.5rem; }
+        .empty-state { text-align: center; color: #64748b; padding: 2rem; background: #1e293b; border-radius: 8px; border: 1px dashed #334155; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/dashboard.html" class="brand">← Dashboard</a>
+            <span>Recorded Archive</span>
+        </div>
+
+        <h1 class="title">Your Vault Items</h1>
+        <p class="subtitle">All recorded voice notes, letters, and preserved stories attached to your account.</p>
+
+        <div class="section-title">🎙️ Voice Notes & Audio Transcripts</div>
+        <div id="voiceList">
+            <div class="empty-state">Loading voice recordings...</div>
+        </div>
+
+        <div class="section-title" style="margin-top: 2.5rem;">✉️ Time-Locked Letters</div>
+        <div id="letterList">
+            <div class="empty-state">Loading time-locked letters...</div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login.html';
+
+        async function loadVault() {
+            try {
+                // Fetch Voice Notes
+                const voiceRes = await fetch('/api/voice/all', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (voiceRes.ok) {
+                    const voiceData = await voiceRes.json();
+                    renderList('voiceList', voiceData, 'audio');
+                } else {
+                    document.getElementById('voiceList').innerHTML = '<div class="empty-state">No voice notes found.</div>';
+                }
+
+                // Fetch Letters
+                const letterRes = await fetch('/api/letters/all', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (letterRes.ok) {
+                    const letterData = await letterRes.json();
+                    renderList('letterList', letterData, 'letter');
+                } else {
+                    document.getElementById('letterList').innerHTML = '<div class="empty-state">No scheduled letters found.</div>';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderList(targetId, items, type) {
+            const container = document.getElementById(targetId);
+            if (!items || items.length === 0) {
+                container.innerHTML = `<div class="empty-state">No ${type === 'audio' ? 'voice recordings' : 'letters'} created yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <span class="item-title">${item.title || item.subject || 'Untitled Entry'}</span>
+                        <span class="badge">${item.tag || item.category || 'General'}</span>
+                    </div>
+                    <div class="item-body">${item.transcript || item.content || item.message || ''}</div>
+                    <div class="meta">
+                        ${type === 'letter' ? `Recipient: ${item.recipientEmail || 'N/A'} | Scheduled: ${item.deliveryDate || 'N/A'}` : `Recorded: ${item.createdAt || 'Saved'}`}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        loadVault();
+    </script>
+</body>
+</html>

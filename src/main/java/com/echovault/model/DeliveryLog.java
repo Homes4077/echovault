@@ -1,16 +1,28 @@
 package com.echovault.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "delivery_logs")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "delivery_logs")
 public class DeliveryLog {
+
+    public enum DeliveryType {
+        EMAIL, SMS, EMERGENCY_TRIGGER
+    }
+
+    public enum Status {
+        SENT, FAILED, PENDING
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +41,5 @@ public class DeliveryLog {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    public enum DeliveryType {
-        EMAIL, SMS, SENDGRID_EMAIL, TWILIO_SMS
-    }
-
-    public enum Status {
-        SENT, FAILED, SUCCESS
-    }
+    private LocalDateTime timestamp;
 }

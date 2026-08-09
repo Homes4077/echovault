@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault — Register</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .auth-card {
+            background-color: #1e293b;
+            padding: 32px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #38bdf8;
+            margin: 0 0 8px 0;
+            text-align: center;
+            font-size: 28px;
+        }
+        p.subtitle {
+            color: #94a3b8;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #ffffff;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: 2px solid #0284c7;
+            border-color: transparent;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            background-color: #0369a1;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+        .alert-error {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+        }
+        .alert-success {
+            background-color: #14532d;
+            color: #86efac;
+        }
+        .link-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .link-footer a {
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h1>EchoVault</h1>
+        <p class="subtitle">Create an account to secure your legacy.</p>
+
+        <div id="alert-box" class="alert"></div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" required placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="name@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-register">Create Vault Account</button>
+        </form>
+
+        <div class="link-footer">
+            Already have a vault? <a href="/login.html">Sign In</a>
+        </div>
+    </div>
+
+    <script src="/js/register.js"></script>
+</body>
+</html>

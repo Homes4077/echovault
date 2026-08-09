@@ -1,82 +1,85 @@
-/**
- * EchoVault Ghost Engine Interrogation Interface
- * Asynchronously posts user query and renders reconstructed response grounded in DB entries
- */
-
-function sendQuery() {
-    const input = document.getElementById("userInput");
-    const chatBox = document.getElementById("chatBox");
-
-    if (!input || !chatBox) return;
-
-    const queryText = input.value.trim();
-    if (!queryText) return;
-
-    // Render User Message Bubble
-    appendMessage(queryText, "msg-user");
-    input.value = "";
-
-    // Render Loading Indicator
-    const loadingDiv = appendMessage("Consulting preserved memories...", "msg-ghost");
-
-    const vaultOwnerId = document.getElementById("vaultOwnerId") ? document.getElementById("vaultOwnerId").value : 1;
-    const queriedById = document.getElementById("queriedById") ? document.getElementById("queriedById").value : 1;
-
-    fetch("/ghost/query", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            vaultOwnerId: parseInt(vaultOwnerId),
-            queriedById: parseInt(queriedById),
-            queryText: queryText
-        })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Failed to consult Ghost Engine.");
-        return response.json();
-    })
-    .then(data => {
-        // Remove loading state
-        loadingDiv.remove();
-
-        // Render Gemini Reconstructed Answer
-        const ghostMsgEl = appendMessage(data.responseText, "msg-ghost");
-
-        // Attach Source Attributions if available
-        if (data.sourcesUsed) {
-            const sourceSpan = document.createElement("span");
-            sourceSpan.className = "source-tag";
-            sourceSpan.style.cssText = "display: block; font-size: 0.75rem; color: #38bdf8; margin-top: 6px;";
-            sourceSpan.innerText = "Ground Truth Sources: " + data.sourcesUsed;
-            ghostMsgEl.appendChild(sourceSpan);
-        }
-    })
-    .catch(error => {
-        console.error("Ghost Engine error:", error);
-        loadingDiv.innerText = "Unable to process query at this time.";
-    });
+// Utility function to strip Gemini citation and grounding span tags
+function sanitizeAiMessage(text) {
+    if (!text) return '';
+    return text
+        .replace(/\[span_\d+\]\((?:start|end)_span\)/g, '')
+        .replace(/\[span_\d+\]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
-function appendMessage(text, className) {
-    const chatBox = document.getElementById("chatBox");
-    const msgDiv = document.createElement("div");
-    msgDiv.className = `msg ${className}`;
-    msgDiv.innerText = text;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    return msgDiv;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatContainer = document.getElementById('chat-container');
 
-// Allow Enter key press to submit query
-document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("userInput");
-    if (input) {
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                sendQuery();
+    if (!chatForm || !chatInput || !chatContainer) {
+        console.warn('Chat elements not found in DOM.');
+        return;
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = chatInput.value.trim();
+        if (!query) return;
+
+        // 1. Display User Message
+        appendMessage('user', query);
+        chatInput.value = '';
+
+        // 2. Display Loading Indicator
+        const loadingBubble = appendMessage('ghost', 'Ghost is thinking...');
+        loadingBubble.style.fontStyle = 'italic';
+        loadingBubble.style.opacity = '0.7';
+
+        try {
+            // 3. Send API Request to Spring Boot Backend
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/ghost/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ prompt: query })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
+
+            const data = await response.json();
+            
+            // Extract reply payload
+            const rawReply = data.reply || data.response || data;
+            
+            // 4. Sanitize text to remove span tags
+            const cleanReply = sanitizeAiMessage(
+                typeof rawReply === 'string' ? rawReply : JSON.stringify(rawReply)
+            );
+
+            // 5. Render Clean Reply
+            loadingBubble.textContent = cleanReply;
+            loadingBubble.style.fontStyle = 'normal';
+            loadingBubble.style.opacity = '1';
+
+        } catch (error) {
+            console.error('Ghost Engine Error:', error);
+            loadingBubble.textContent = 'Error connecting to Ghost Assistant Engine.';
+            loadingBubble.style.color = '#ef4444';
+        }
+
+        // Auto scroll chat to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+
+    // Helper to append message bubbles to the container
+    function appendMessage(sender, text) {
+        const msgBubble = document.createElement('div');
+        msgBubble.classList.add('message-bubble', `${sender}-bubble`);
+        msgBubble.textContent = text;
+        chatContainer.appendChild(msgBubble);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return msgBubble;
     }
 });

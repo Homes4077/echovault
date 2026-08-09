@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault - Emergency Access & Setup</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b1120; color: #f8fafc; min-height: 100vh; padding: 2rem 1rem; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .brand { color: #0ea5e9; font-weight: 700; text-decoration: none; font-size: 1.1rem; }
+        .nav-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: #131c31; padding: 0.35rem; border-radius: 8px; border: 1px solid #1e293b; }
+        .tab-btn { flex: 1; padding: 0.75rem; background: transparent; border: none; color: #94a3b8; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s; font-size: 0.9rem; }
+        .tab-btn.active { background: #0ea5e9; color: #ffffff; }
+        .card { background: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
+        .card-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .title-unlock { color: #ef4444; }
+        .title-setup { color: #0ea5e9; }
+        .card-subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.5; }
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem; font-weight: 500; }
+        input, select { width: 100%; padding: 0.85rem; background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; color: #fff; font-size: 0.95rem; outline: none; }
+        input:focus, select:focus { border-color: #0ea5e9; }
+        .btn-action { width: 100%; padding: 0.85rem; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s; font-size: 0.95rem; }
+        .btn-unlock { background: #ef4444; }
+        .btn-setup { background: #0ea5e9; }
+        .btn-action:hover { opacity: 0.9; }
+        .status-msg { margin-top: 1.25rem; padding: 0.85rem; border-radius: 6px; font-size: 0.875rem; display: none; text-align: center; font-weight: 500; }
+        .status-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
+        .status-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/dashboard.html" class="brand">← Dashboard</a>
+            <span style="color: #64748b; font-size: 0.9rem;">Emergency Protocols</span>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tabUnlockBtn" onclick="switchTab('unlock')">Family Access Unlock</button>
+            <button class="tab-btn" id="tabSetupBtn" onclick="switchTab('setup')">Configure Recovery Question</button>
+        </div>
+
+        <!-- Panel 1: Family Unlock -->
+        <div id="unlockPanel" class="card">
+            <h1 class="card-title title-unlock">Emergency Family Access</h1>
+            <p class="card-subtitle">Answering the security question correctly grants access to emergency vault contents.</p>
+
+            <form id="unlockForm">
+                <div class="form-group">
+                    <label>Account Owner Email</label>
+                    <input type="email" id="ownerEmail" placeholder="owner@echovault.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Security Question Answer</label>
+                    <input type="text" id="securityAnswer" placeholder="Your answer..." required autocomplete="off">
+                </div>
+                <button type="submit" class="btn-action btn-unlock">Verify Answer & Unlock</button>
+            </form>
+            <div id="unlockStatus" class="status-msg"></div>
+        </div>
+
+        <!-- Panel 2: Owner Recovery Setup -->
+        <div id="setupPanel" class="card" style="display: none;">
+            <h1 class="card-title title-setup">Set Recovery Question</h1>
+            <p class="card-subtitle">Define the security prompt and secret answer family members must provide during emergency recovery.</p>
+
+            <form id="setupForm">
+                <div class="form-group">
+                    <label>Select or Type Security Question</label>
+                    <select id="questionSelect" onchange="toggleCustomQuestion(this)">
+                        <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                        <option value="What street did you grow up on?">What street did you grow up on?</option>
+                        <option value="What primary school did you attend?">What primary school did you attend?</option>
+                        <option value="custom">-- Custom Question --</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customGroup" style="display: none;">
+                    <label>Custom Security Question</label>
+                    <input type="text" id="customQuestion" placeholder="Enter your custom question">
+                </div>
+                <div class="form-group">
+                    <label>Secret Answer</label>
+                    <input type="text" id="setupAnswer" placeholder="Enter answer (case-insensitive)" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn-action btn-setup">Save Security Protocol</button>
+            </form>
+            <div id="setupStatus" class="status-msg"></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        function switchTab(tab) {
+            document.getElementById('unlockPanel').style.display = tab === 'unlock' ? 'block' : 'none';
+            document.getElementById('setupPanel').style.display = tab === 'setup' ? 'block' : 'none';
+            document.getElementById('tabUnlockBtn').classList.toggle('active', tab === 'unlock');
+            document.getElementById('tabSetupBtn').classList.toggle('active', tab === 'setup');
+        }
+
+        function toggleCustomQuestion(select) {
+            document.getElementById('customGroup').style.display = select.value === 'custom' ? 'block' : 'none';
+        }
+
+        // Setup Recovery Question Form Submit
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('setupStatus');
+            status.style.display = 'none';
+
+            if (!token) {
+                status.className = 'status-msg status-error';
+                status.textContent = 'Session missing or expired. Please login again.';
+                status.style.display = 'block';
+                return;
+            }
+
+            const selectVal = document.getElementById('questionSelect').value;
+            const question = selectVal === 'custom' ? document.getElementById('customQuestion').value.trim() : selectVal;
+            const answer = document.getElementById('setupAnswer').value.trim();
+
+            if (!question || !answer) {
+                status.className = 'status-msg status-error';
+                status.textContent = 'Please fill out all required fields.';
+                status.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/emergency/setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ question, answer })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    status.className = 'status-msg status-success';
+                    status.textContent = data.message || 'Recovery question and answer configured successfully!';
+                } else {
+                    throw new Error(data.error || 'Failed to save configuration.');
+                }
+            } catch (err) {
+                status.className = 'status-msg status-error';
+                status.textContent = err.message || 'Failed to save security configuration. Check server auth.';
+            }
+            status.style.display = 'block';
+        });
+
+        // Family Unlock Submit
+        document.getElementById('unlockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('unlockStatus');
+            status.style.display = 'none';
+
+            const email = document.getElementById('ownerEmail').value.trim();
+            const answer = document.getElementById('securityAnswer').value.trim();
+
+            try {
+                const res = await fetch('/api/emergency/unlock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, answer })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    status.className = 'status-msg status-success';
+                    status.textContent = 'Access Granted. Redirecting to Emergency Archive...';
+                    status.style.display = 'block';
+                    setTimeout(() => window.location.href = '/memorial.html', 1200);
+                } else {
+                    throw new Error(data.error || 'Incorrect security answer or account not found.');
+                }
+            } catch (err) {
+                status.className = 'status-msg status-error';
+                status.textContent = err.message || 'Incorrect security answer or account not found.';
+                status.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

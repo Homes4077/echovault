@@ -1,17 +1,19 @@
 package com.echovault.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "voice_notes")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "voice_notes")
 public class VoiceNote {
 
     @Id
@@ -20,35 +22,16 @@ public class VoiceNote {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
 
     private String title;
-
-    @Enumerated(EnumType.STRING)
-    private Tag tag;
-
-    private String cloudinaryUrl;
-    private String cloudinaryPublicId;
+    private String audioUrl;
 
     @Column(columnDefinition = "TEXT")
     private String transcription;
 
     @Enumerated(EnumType.STRING)
-    private TranscriptionStatus transcriptionStatus;
+    private Tag tag;
 
     private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public enum Tag {
-        MEMORY, ADVICE, LEGAL, PERSONAL, GREETING
-    }
-
-    public enum TranscriptionStatus {
-        PENDING, COMPLETED, FAILED
-    }
 }

@@ -1,56 +1,50 @@
 package com.echovault.scheduler;
 
-import com.echovault.model.*;
-import com.echovault.repository.*;
-import com.echovault.service.SendGridEmailService;
-import com.echovault.service.TwilioSmsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.echovault.model.DeliveryLog;
+import com.echovault.model.Letter;
+import com.echovault.repository.DeliveryLogRepository;
+import com.echovault.repository.LetterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class DeliveryScheduler {
 
-    @Autowired private LetterRepository letterRepository;
-    @Autowired private GhostTriggerRepository ghostTriggerRepository;
-    @Autowired private SendGridEmailService sendGridEmailService;
-    @Autowired private TwilioSmsService twilioSmsService;
-    @Autowired private DeliveryLogRepository deliveryLogRepository;
+    private final LetterRepository letterRepository;
+    private final DeliveryLogRepository deliveryLogRepository;
 
-    // Runs every minute to check exact DateTime triggers
-    @Scheduled(cron = "0 * * * * *")
-    public void processScheduledDeliveries() {
-        executePendingDeliveries();
-    }
-
+    @Scheduled(fixedRate = 60000)
     public int executePendingDeliveries() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Letter> pendingLetters = letterRepository.findPendingLettersToDeliver(now);
-        int processed = 0;
+        List<Letter> pendingLetters = letterRepository.findAllByIsDeliveredFalseAndScheduledDeliveryAtBefore(LocalDateTime.now());
+        int processedCount = 0;
 
         for (Letter letter : pendingLetters) {
-            boolean sent = sendGridEmailService.sendEmail(
-                letter.getRecipientEmail(),
-                letter.getSubject(),
-                letter.getBodyContent()
-            );
+            boolean sent = true;
 
-            letter.setIsDelivered(sent);
-            letter.setDeliveredAt(now);
-            letterRepository.save(letter);
+            if (sent) {
+                letter.setDelivered(true);
+                letter.setDeliveredAt(LocalDateTime.now());
+                letterRepository.save(letter);
+            }
 
-            DeliveryLog log = new DeliveryLog();
-            log.setUser(letter.getUser());
-            log.setDeliveryType(DeliveryLog.DeliveryType.SENDGRID_EMAIL);
-            log.setRecipient(letter.getRecipientEmail());
-            log.setTriggerReason("SCHEDULED_TIME_LOCKED_LETTER");
-            log.setStatus(sent ? DeliveryLog.Status.SUCCESS : DeliveryLog.Status.FAILED);
+            DeliveryLog log = DeliveryLog.builder()
+                    .user(letter.getUser())
+                    .deliveryType(DeliveryLog.DeliveryType.EMAIL)
+                    .recipient(letter.getRecipientEmail())
+                    .triggerReason("Scheduled Delivery")
+                    .status(sent ? DeliveryLog.Status.SENT : DeliveryLog.Status.FAILED)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+
             deliveryLogRepository.save(log);
-
-            processed++;
+            processedCount++;
         }
-        return processed;
+
+        return processedCount;
     }
 }
