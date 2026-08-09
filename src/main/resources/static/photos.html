@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault - Photo Vault</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .nav-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .upload-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], select, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .photo-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .photo-info {
+            padding: 12px;
+        }
+
+        .photo-title {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .photo-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: #333;
+            color: var(--accent-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .photo-caption {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Photo Vault</h1>
+            <a href="/dashboard.html" class="nav-link">&larr; Back to Dashboard</a>
+        </div>
+
+        <div class="upload-section">
+            <h3>Upload New Photograph</h3>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" required placeholder="Memory title...">
+                </div>
+
+                <div class="form-group">
+                    <label for="tag">Category Tag</label>
+                    <select id="tag">
+                        <option value="PERSONAL">PERSONAL</option>
+                        <option value="FAMILY">FAMILY</option>
+                        <option value="WORK">WORK</option>
+                        <option value="EMERGENCY">EMERGENCY</option>
+                        <option value="MEMORY" selected>MEMORY</option>
+                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="caption">Caption</label>
+                    <input type="text" id="caption" placeholder="Brief description...">
+                </div>
+
+                <div class="form-group">
+                    <label for="file">Image File</label>
+                    <input type="file" id="file" accept="image/*" required>
+                </div>
+
+                <button type="submit">Upload Photo</button>
+            </form>
+        </div>
+
+        <h3>Your Vault Photos</h3>
+        <div id="galleryGrid" class="gallery-grid">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwt_token');
+
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        async function fetchPhotos() {
+            try {
+                const res = await fetch('/api/photographs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to load photos');
+                const photos = await res.json();
+                renderGallery(photos);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderGallery(photos) {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            if (photos.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-muted);">No photos saved in vault yet.</p>';
+                return;
+            }
+
+            photos.forEach(photo => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${photo.imageUrl}" alt="${photo.title}">
+                    <div class="photo-info">
+                        <span class="photo-tag">${photo.tag}</span>
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-caption">${photo.caption || ''}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('tag', document.getElementById('tag').value);
+            formData.append('caption', document.getElementById('caption').value);
+            formData.append('file', document.getElementById('file').files[0]);
+
+            try {
+                const res = await fetch('/api/photographs', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (res.ok) {
+                    document.getElementById('uploadForm').reset();
+                    fetchPhotos();
+                } else {
+                    alert('Upload failed');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        fetchPhotos();
+    </script>
+</body>
+</html>
