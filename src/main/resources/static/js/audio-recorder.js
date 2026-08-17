@@ -1,14 +1,6 @@
-/**
- * EchoVault Browser Audio Recording Engine
- * Captures user voice via HTML5 MediaRecorder API and posts binary data to Spring Boot
- */
-
-let mediaRecorder = null;
+let mediaRecorder;
 let audioChunks = [];
 
-/**
- * Initiates microphone audio capture
- */
 async function startRecording() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -16,80 +8,58 @@ async function startRecording() {
         audioChunks = [];
 
         mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                audioChunks.push(event.data);
-            }
+            if (event.data.size > 0) audioChunks.push(event.data);
         };
 
-        mediaRecorder.onstop = handleRecordingUpload;
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+            await uploadVoiceNote(audioBlob);
+        };
+
         mediaRecorder.start();
-
-        updateRecordingUI(true);
+        console.log('Recording started...');
     } catch (err) {
-        console.error("Microphone access denied or unrecorded:", err);
-        alert("Microphone permission is required to record voice notes.");
+        alert('Microphone access denied or unsupported.');
     }
 }
 
-/**
- * Stops current audio stream session
- */
 function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
-        // Stop all active tracks on the stream to release the mic
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
-        updateRecordingUI(false);
+        console.log('Recording stopped...');
     }
 }
 
-/**
- * Packages recorded audio binary into FormData and sends to backend upload endpoint
- */
-function handleRecordingUpload() {
-    const statusEl = document.getElementById("status");
-    if (statusEl) statusEl.innerText = "Processing audio & requesting transcription...";
+async function uploadVoiceNote(blob) {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        alert('You must be logged in to upload voice notes.');
+        return;
+    }
 
-    const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
     const formData = new FormData();
+    formData.append('file', blob, 'voicenote.mp3');
+    formData.append('title', document.getElementById('voiceTitle')?.value || 'Voice Note');
 
-    const userId = document.getElementById("userId") ? document.getElementById("userId").value : "1";
-    const title = document.getElementById("title") ? document.getElementById("title").value : "Untitled Memory";
-    const tag = document.getElementById("tag") ? document.getElementById("tag").value : "STORY";
+    try {
+        const response = await fetch('/api/voice-notes/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // Content-Type is left unset so the browser generates the boundary
+            },
+            body: formData
+        });
 
-    formData.append("userId", userId);
-    formData.append("title", title);
-    formData.append("tag", tag);
-    formData.append("file", audioBlob, "voice-note.wav");
+        if (!response.ok) {
+            const err = await response.text();
+            alert(`Voice note upload failed: ${err}`);
+            return;
+        }
 
-    fetch("/vault/voice/upload", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Upload failed.");
-        return response.text();
-    })
-    .then(result => {
-        if (statusEl) statusEl.innerText = "Voice note saved and transcribed successfully!";
-    })
-    .catch(error => {
-        console.error("Error saving voice note:", error);
-        if (statusEl) statusEl.innerText = "Failed to upload and transcribe audio.";
-    });
-}
-
-function updateRecordingUI(isRecording) {
-    const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const statusEl = document.getElementById("status");
-
-    if (isRecording) {
-        if (startBtn) startBtn.style.display = "none";
-        if (stopBtn) stopBtn.style.display = "inline-block";
-        if (statusEl) statusEl.innerText = "🔴 Recording in progress...";
-    } else {
-        if (startBtn) startBtn.style.display = "inline-block";
-        if (stopBtn) stopBtn.style.display = "none";
+        alert('Voice note saved successfully!');
+    } catch (err) {
+        console.error('Upload Error:', err);
+        alert('Failed to upload voice note.');
     }
 }

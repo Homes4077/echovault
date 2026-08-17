@@ -3,10 +3,9 @@ package com.echovault.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GeminiGhostEngineService implements GhostEngineService {
+public class GeminiGhostEngineService {
 
-    @Override
-    public String interrogateVault(String query, String userIdentifier) {
-        return "Gemini Ghost Engine processing query: " + query;
+    public String generateResponse(String userEmail, String prompt) {
+        return "Gemini Ghost Engine response for user " + userEmail + ": " + prompt;
     }
 }

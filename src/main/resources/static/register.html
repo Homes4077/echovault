@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Register</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
         body {
             background-color: #0f172a;
             color: #ffffff;
-            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
         .auth-card {
             background-color: #1e293b;
             padding: 32px;
             border-radius: 12px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
         }
         h1 {
             color: #38bdf8;
@@ -44,19 +49,41 @@
             font-size: 14px;
             color: #cbd5e1;
         }
-        input {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 12px;
             border-radius: 6px;
             border: 1px solid #334155;
             background-color: #0f172a;
             color: #ffffff;
-            box-sizing: border-box;
             font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, outline 0.2s;
         }
         input:focus {
             outline: 2px solid #0284c7;
             border-color: transparent;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0284c7;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #94a3b8;
         }
         .btn-submit {
             width: 100%;
@@ -69,9 +96,14 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 8px;
+            transition: background-color 0.2s;
         }
         .btn-submit:hover {
             background-color: #0369a1;
+        }
+        .btn-submit:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
         }
         .alert {
             padding: 12px;
@@ -100,6 +132,9 @@
             text-decoration: none;
             font-weight: bold;
         }
+        .link-footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -108,22 +143,32 @@
         <h1>EchoVault</h1>
         <p class="subtitle">Create an account to secure your legacy.</p>
 
-        <div id="alert-box" class="alert"></div>
+        <div id="alert-box" class="alert" aria-live="polite"></div>
 
-        <form id="register-form">
+        <form id="registerForm">
             <div class="form-group">
                 <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" required placeholder="John Doe">
+                <input type="text" id="fullName" name="fullName" required placeholder="John Doe">
             </div>
 
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="name@example.com">
+                <input type="email" id="email" name="email" required placeholder="name@example.com" autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="requestAdmin" name="requestAdmin">
+                <label for="requestAdmin">Register as Administrator</label>
             </div>
 
             <button type="submit" class="btn-submit" id="btn-register">Create Vault Account</button>
@@ -134,6 +179,101 @@
         </div>
     </div>
 
-    <script src="/js/register.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const alertBox = document.getElementById('alert-box');
+            const submitBtn = document.getElementById('btn-register');
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const requestAdmin = document.getElementById('requestAdmin').checked;
+
+            alertBox.style.display = 'none';
+            alertBox.className = 'alert';
+            alertBox.textContent = '';
+
+            // Password confirmation check
+            if (password !== confirmPassword) {
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = 'Passwords do not match.';
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullName: fullName,
+                        name: fullName,
+                        email: email,
+                        password: password,
+                        requestAdmin: requestAdmin,
+                        isAdmin: requestAdmin,
+                        role: requestAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'
+                    })
+                });
+
+                let data = {};
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const rawText = await response.text();
+                    if (rawText) data = { message: rawText };
+                }
+
+                if (response.ok) {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.textContent = data.message || 'Account created successfully! Redirecting...';
+                    alertBox.style.display = 'block';
+
+                    const token = data.token || data.jwtToken || data.accessToken;
+                    if (token) {
+                        localStorage.setItem('jwtToken', token);
+                        setTimeout(() => {
+                            window.location.href = '/vault.html';
+                        }, 1200);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = '/login.html';
+                        }, 1200);
+                    }
+                } else {
+                    let errorMsg = 'Registration failed. Please try again.';
+                    if (typeof data.error === 'string') {
+                        errorMsg = data.error;
+                    } else if (data.error && data.error.message) {
+                        errorMsg = data.error.message;
+                    } else if (data.message) {
+                        errorMsg = data.message;
+                    }
+
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = errorMsg;
+                    alertBox.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Registration failure:', error);
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = 'Connection error. Please ensure the backend server is active.';
+                alertBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Vault Account';
+            }
+        });
+    </script>
 </body>
 </html>

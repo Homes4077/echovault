@@ -1,87 +1,236 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Write Time-Locked Letter</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 650px; margin: auto; }
-        .box { background: #1e293b; padding: 2rem; border-radius: 12px; border: 1px solid #334155; }
-        .form-group { margin-bottom: 1.2rem; }
-        label { display: block; margin-bottom: 0.4rem; color: #cbd5e1; }
-        input, select, textarea { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        textarea { height: 150px; resize: vertical; }
-        .btn-save { background: #0284c7; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
-        #msg { margin-top: 15px; color: #4ade80; text-align: center; font-weight: bold; }
-    </style>
+
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="box">
-        <h2>Schedule Time-Locked Letter</h2>
-        <p style="color:#94a3b8;">This letter will be delivered via SendGrid automatically at the specified DateTime[span_8](start_span)[span_8](end_span).</p>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
-        <div class="form-group">
-            <label>Recipient Name</label>
-            <input type="text" id="recipientName" placeholder="Jane Doe" required>
+    <!-- NAVIGATION HEADER -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/vault.html" class="text-xl font-bold tracking-wider text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-hourglass-half"></i>
+                EchoVault
+            </a>
+            <div class="flex gap-6 text-sm font-medium">
+                <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
+                <a href="/photos.html" class="text-slate-400 hover:text-slate-200 transition">Photos</a>
+                <a href="/memorial.html" class="text-slate-400 hover:text-slate-200 transition">Memorial Wall</a>
+                <a href="/compose.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Write Letter</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-2xl mx-auto px-4 py-10 flex-1 w-full">
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+            
+            <!-- Header Title -->
+            <div class="mb-8 border-b border-slate-800 pb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-100">Schedule Time-Locked Letter</h1>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+                            This letter will be locked in the vault and delivered automatically at your specified delivery time.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compose Form -->
+            <form id="composeForm" onsubmit="scheduleLetter(event)" class="space-y-5">
+
+                <!-- Recipient Name -->
+                <div>
+                    <label for="recipientName" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                        Recipient Name
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="recipientName" placeholder="e.g. Jane Doe" required
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
+                    </div>
+                </div>
+
+                <!-- Recipient Email -->
+                <div>
+                    <label for="recipientEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                        Recipient Email
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="recipientEmail" placeholder="jane@example.com" required
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
+                    </div>
+                </div>
+
+                <!-- Subject Line -->
+                <div>
+                    <label for="subject" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                        Subject Line
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
+                            <i class="fa-solid fa-heading"></i>
+                        </span>
+                        <input type="text" id="subject" placeholder="A message for your 25th birthday" required
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
+                    </div>
+                </div>
+
+                <!-- Tag & Delivery Date -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="tag" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                            Tag Category
+                        </label>
+                        <select id="tag" required
+                            class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
+                            <option value="MOTIVATIONAL">Motivational</option>
+                            <option value="LOVE">Love</option>
+                            <option value="STORY">Story</option>
+                            <option value="WARNING">Warning</option>
+                            <option value="FAITH">Faith</option>
+                            <option value="CELEBRATION">Celebration</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="scheduledDeliveryAt" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                            Delivery Date & Time
+                        </label>
+                        <input type="datetime-local" id="scheduledDeliveryAt" required
+                            class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition color-scheme-dark">
+                    </div>
+                </div>
+
+                <!-- Letter Content -->
+                <div>
+                    <label for="bodyContent" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                        Letter Content
+                    </label>
+                    <textarea id="bodyContent" rows="6" placeholder="Write your time-locked message here..." required
+                        class="w-full p-4 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn"
+                    class="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-lg hover:shadow-amber-500/20 transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-vault"></i>
+                    <span>Lock & Schedule Letter</span>
+                </button>
+
+                <!-- Status Feedback Message -->
+                <div id="msg" class="text-center font-medium text-sm pt-2 min-h-[24px]"></div>
+
+            </form>
         </div>
 
-        <div class="form-group">
-            <label>Recipient Email</label>
-            <input type="email" id="recipientEmail" placeholder="jane@example.com" required>
-        </div>
+    </main>
 
-        <div class="form-group">
-            <label>Subject Line</label>
-            <input type="text" id="subject" placeholder="A message for your 25th birthday" required>
-        </div>
-
-        <div class="form-group">
-            <label>Tag Category</label>
-            <select id="tag">
-                <option value="MOTIVATIONAL">Motivational</option>
-                <option value="LOVE">Love</option>
-                <option value="STORY">Story</option>
-                <option value="WARNING">Warning</option>
-                <option value="FAITH">Faith</option>
-                <option value="CELEBRATION">Celebration</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Exact Delivery DateTime</label>
-            <input type="datetime-local" id="scheduledDeliveryAt" required>
-        </div>
-
-        <div class="form-group">
-            <label>Letter Content</label>
-            <textarea id="bodyContent" placeholder="Write your letter here..."></textarea>
-        </div>
-
-        <button onclick="scheduleLetter()" class="btn-save">Lock & Schedule Letter</button>
-        <div id="msg"></div>
-    </div>
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center">
+        <p class="text-xs text-slate-600">
+            EchoVault — Preserving memories, stories, and legacies.
+        </p>
+    </footer>
 
     <script>
-        function scheduleLetter() {
-            const payload = {
-                userId: 1, // Dynamically populated in live application
-                recipientName: document.getElementById('recipientName').value,
-                recipientEmail: document.getElementById('recipientEmail').value,
-                subject: document.getElementById('subject').value,
-                tag: document.getElementById('tag').value,
-                scheduledDeliveryAt: document.getElementById('scheduledDeliveryAt').value,
-                bodyContent: document.getElementById('bodyContent').value
-            };
+    function getStoredToken() {
+        return localStorage.getItem('jwtToken') || localStorage.getItem('token') || localStorage.getItem('accessToken');
+    }
 
-            fetch('/vault/letter/compose', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.text())
-            .then(res => {
-                document.getElementById('msg').innerText = 'Letter scheduled successfully!';
-            });
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = getStoredToken();
+        console.log("Current session token:", token);
+
+        if (!token) {
+            console.warn("No JWT token found in localStorage.");
         }
-    </script>
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('scheduledDeliveryAt').min = now.toISOString().slice(0, 16);
+    });
+
+    async function scheduleLetter(event) {
+        event.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+        const msgBox = document.getElementById('msg');
+        const token = getStoredToken();
+
+        if (!token) {
+            msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+            msgBox.innerText = 'No session token found. Please log in first.';
+            console.error("Submission blocked: missing token in localStorage.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Locking Letter...</span>`;
+        msgBox.className = 'text-center font-medium text-sm pt-2 min-h-[24px]';
+        msgBox.innerText = '';
+
+        const dateValue = document.getElementById('scheduledDeliveryAt').value;
+        const formattedDate = dateValue ? (dateValue.length === 16 ? dateValue + ':00' : dateValue) : null;
+
+        const payload = {
+            recipientName: document.getElementById('recipientName').value.trim(),
+            recipientEmail: document.getElementById('recipientEmail').value.trim(),
+            subject: document.getElementById('subject').value.trim(),
+            tag: document.getElementById('tag').value,
+            scheduledDeliveryAt: formattedDate,
+            bodyContent: document.getElementById('bodyContent').value
+        };
+
+        try {
+            console.log("Sending payload to backend with Bearer token...");
+            const response = await fetch('/vault/letter/compose', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(payload)
+            });
+
+            console.log("Backend response status:", response.status);
+
+            if (response.ok) {
+                msgBox.className = 'text-center font-medium text-sm pt-2 text-emerald-400';
+                msgBox.innerText = '🔒 Letter scheduled and locked in vault successfully!';
+                document.getElementById('composeForm').reset();
+            } else {
+                const errText = await response.text();
+                console.error(`HTTP ${response.status} Error details:`, errText);
+                
+                msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+                msgBox.innerText = `Server Error (${response.status}): ${errText || 'Unauthorized access'}`;
+            }
+        } catch (err) {
+            console.error('Network or CORS error:', err);
+            msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+            msgBox.innerText = 'Network error. Check backend server and console logs.';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-vault"></i> <span>Lock & Schedule Letter</span>`;
+        }
+    }
+</script>
+
 </body>
 </html>

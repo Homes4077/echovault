@@ -9,3 +9,6 @@ target/
 .settings/
 *.log
 .DS_Store
+run.sh
+data/*.db
+uploads/

@@ -1,92 +1,173 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EchoVault — Voice Note Recorder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault — Record Voice Memory</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 600px; margin: auto; }
-        .box { background: #1e293b; padding: 2rem; border-radius: 12px; border: 1px solid #334155; }
-        .form-group { margin-bottom: 1.2rem; }
-        label { display: block; margin-bottom: 0.4rem; color: #cbd5e1; }
-        input, select { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .record-controls { text-align: center; margin: 1.5rem 0; }
-        .btn-rec { background: #ef4444; color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-stop { background: #64748b; color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; display: none; }
-        #status { font-weight: bold; margin-top: 10px; color: #38bdf8; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b1120; color: #f8fafc; min-height: 100vh; padding: 2rem 1rem; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #1e293b; padding-bottom: 1rem; }
+        .brand { color: #0ea5e9; font-weight: 700; text-decoration: none; font-size: 1.1rem; }
+        .brand:hover { text-decoration: underline; }
+
+        .card { background: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
+        .card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.35rem; color: #f8fafc; }
+        .subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.75rem; line-height: 1.4; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem; font-weight: 500; }
+        input[type="text"], select { width: 100%; padding: 0.85rem; background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; color: #fff; font-size: 0.95rem; outline: none; }
+        input[type="text"]:focus, select:focus { border-color: #0ea5e9; }
+
+        .recorder-controls { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 2rem 0; gap: 1rem; }
+        .btn-record { background: #ef4444; color: white; border: none; padding: 1rem 2rem; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+        .btn-record:hover { background: #dc2626; transform: scale(1.02); }
+        .btn-record.recording { background: #22c55e; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .status-msg { padding: 0.85rem; border-radius: 6px; font-size: 0.875rem; display: none; text-align: center; font-weight: 500; margin-top: 1rem; }
+        .status-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
+        .status-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid #ef4444; }
+        
+        audio { width: 100%; margin-top: 1rem; border-radius: 6px; display: none; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>Record Voice Memory</h2>
-        <p style="color:#94a3b8;">Your recording will be sent to Cloudinary and transcribed by AssemblyAI[span_7](start_span)[span_7](end_span).</p>
-
-        <div class="form-group">
-            <label>Title / Identifier</label>
-            <input type="text" id="title" placeholder="e.g., Advice for my daughter's graduation" required>
+    <div class="container">
+        <div class="header">
+            <a href="/dashboard.html" class="brand">← Dashboard</a>
+            <span style="color: #64748b; font-size: 0.9rem;">Audio Memory</span>
         </div>
 
-        <div class="form-group">
-            <label>Context Tag</label>
-            <select id="tag">
-                <option value="MOTIVATIONAL">Motivational</option>
-                <option value="LOVE">Love</option>
-                <option value="STORY">Story</option>
-                <option value="WARNING">Warning</option>
-                <option value="FAITH">Faith</option>
-                <option value="CELEBRATION">Celebration</option>
-            </select>
-        </div>
+        <div class="card">
+            <h1>Record Voice Memory</h1>
+            <p class="subtitle">Your recording will be securely uploaded and transcribed automatically.</p>
 
-        <div class="record-controls">
-            <button id="startBtn" class="btn-rec" onclick="startRecording()">🔴 Start Recording</button>
-            <button id="stopBtn" class="btn-stop" onclick="stopRecording()">⏹️ Stop & Save</button>
-        </div>
+            <form id="voiceForm">
+                <div class="form-group">
+                    <label for="title">Title / Identifier</label>
+                    <input type="text" id="title" required placeholder="e.g. Motivation">
+                </div>
 
-        <div id="status">Ready</div>
-        <audio id="audioPlayback" controls style="width: 100%; margin-top: 15px; display: none;"></audio>
+                <div class="form-group">
+                    <label for="tag">Context Tag</label>
+                    <select id="tag">
+                        <option value="MOTIVATIONAL" selected>Motivational</option>
+                        <option value="PERSONAL">Personal</option>
+                        <option value="FAMILY">Family</option>
+                        <option value="ADVICE">Advice</option>
+                        <option value="STORY">Story</option>
+                    </select>
+                </div>
+
+                <div class="recorder-controls">
+                    <button type="button" id="recordBtn" class="btn-record">
+                        <span id="recordIcon">🔴</span> <span id="recordText">Start Recording</span>
+                    </button>
+                    <audio id="audioPreview" controls></audio>
+                </div>
+
+                <div id="statusAlert" class="status-msg"></div>
+            </form>
+        </div>
     </div>
 
+    <script src="/js/auth-check.js"></script>
     <script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) window.location.href = '/login.html';
+
         let mediaRecorder;
         let audioChunks = [];
+        let audioBlob = null;
+        let isRecording = false;
 
-        async function startRecording() {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
+        const recordBtn = document.getElementById('recordBtn');
+        const recordText = document.getElementById('recordText');
+        const audioPreview = document.getElementById('audioPreview');
+        const statusAlert = document.getElementById('statusAlert');
 
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.onstop = uploadAudio;
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                // Start Recording
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
 
-            mediaRecorder.start();
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'inline-block';
-            document.getElementById('status').innerText = 'Recording in progress...';
-        }
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) audioChunks.push(event.data);
+                    };
 
-        function stopRecording() {
-            mediaRecorder.stop();
-            document.getElementById('startBtn').style.display = 'inline-block';
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('status').innerText = 'Processing & Transcribing...';
-        }
+                    mediaRecorder.onstop = async () => {
+                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        audioPreview.src = audioUrl;
+                        audioPreview.style.display = 'block';
+                        await autoUploadVoiceNote();
+                    };
 
-        function uploadAudio() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordBtn.classList.add('recording');
+                    recordText.textContent = 'Stop Recording';
+                } catch (err) {
+                    showStatus('Microphone permission denied or unavailable.', 'error');
+                }
+            } else {
+                // Stop Recording
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                recordText.textContent = 'Record Again';
+            }
+        });
+
+        async function autoUploadVoiceNote() {
+            const title = document.getElementById('title').value.trim();
+            const tag = document.getElementById('tag').value;
+
+            if (!title) {
+                showStatus('Please enter a Title / Identifier before uploading.', 'error');
+                return;
+            }
+
+            showStatus('Uploading & Transcribing...', 'success');
+
             const formData = new FormData();
-            formData.append('userId', '1'); // Replace dynamically in real app
-            formData.append('title', document.getElementById('title').value || 'Untitled Note');
-            formData.append('tag', document.getElementById('tag').value);
-            formData.append('file', audioBlob, 'recording.wav');
+            formData.append('title', title);
+            formData.append('tag', tag);
+            formData.append('file', audioBlob, 'voicenote.webm');
 
-            fetch('/vault/voice/upload', { method: 'POST', body: formData })
-                .then(r => r.text())
-                .then(res => {
-                    document.getElementById('status').innerText = 'Saved & Transcribed successfully!';
-                })
-                .catch(() => {
-                    document.getElementById('status').innerText = 'Error saving recording.';
+            try {
+                const res = await fetch('/api/voice-notes', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
                 });
+
+                if (res.ok) {
+                    showStatus('Saved & Transcribed successfully!', 'success');
+                } else {
+                    const errText = await res.text();
+                    showStatus('Upload failed: ' + (errText || 'Server error'), 'error');
+                }
+            } catch (err) {
+                showStatus('Network error during upload.', 'error');
+            }
+        }
+
+        function showStatus(msg, type) {
+            statusAlert.className = `status-msg status-${type}`;
+            statusAlert.textContent = msg;
+            statusAlert.style.display = 'block';
         }
     </script>
 </body>

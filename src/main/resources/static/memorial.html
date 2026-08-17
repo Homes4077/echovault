@@ -1,38 +1,291 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EchoVault — Memorial Legacy</title>
-    <style>
-        body { font-family: 'Georgia', serif; background: #0f172a; color: #f1f5f9; margin: 0; padding: 0; }
-        .hero { background: linear-gradient(rgba(15,23,42,0.7), rgba(15,23,42,1)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover; height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .hero h1 { font-size: 2.5rem; margin: 0; color: #f8fafc; }
-        .hero p { color: #cbd5e1; font-style: italic; }
-        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .timeline-item { background: #1e293b; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #0284c7; }
-        .tag { display: inline-block; background: #0284c7; color: white; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-family: sans-serif; text-transform: uppercase; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoVault — Memorial Wall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="hero">
-        <h1 th:text="${ownerName != null ? ownerName : 'JohnMark Gitahi'}">JohnMark Gitahi</h1>
-        <p>In Loving Memory & Preserved Wisdom</p>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30">
+
+    <!-- NAVIGATION -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/vault.html" class="text-xl font-bold tracking-wider text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-ribbon text-amber-500"></i>
+                EchoVault
+            </a>
+            <div class="flex gap-6 text-sm font-medium">
+                <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
+                <a href="/write-letter.html" class="text-slate-400 hover:text-slate-200 transition">Write Letter</a>
+                <a href="/photos.html" class="text-slate-400 hover:text-slate-200 transition">Photos</a>
+                <a href="/memorial.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Memorial Wall</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO HEADER -->
+    <header class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800 py-14 text-center px-4">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-amber-400 text-3xl mb-4">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-amber-100 tracking-tight">
+                The Memorial Wall
+            </h1>
+            <p class="text-sm md:text-base text-slate-400 mt-3">
+                Public messages, cherished memories, photographs, and stories preserved for eternity.
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full">
+
+        <!-- MEMORIAL LETTERS SECTION -->
+        <section class="mb-14">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
+                    <i class="fa-solid fa-feather-pointed text-amber-400"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-amber-100">Memorial Tributes</h2>
+                    <p class="text-xs text-slate-500">Messages and stories shared in remembrance</p>
+                </div>
+            </div>
+
+            <div id="memorialGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mb-3 text-xl"></i>
+                    <p>Loading memorial tributes...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MEMORIAL PHOTOS SECTION -->
+        <section>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
+                    <i class="fa-solid fa-images text-amber-400"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-amber-100">Cherished Memories</h2>
+                    <p class="text-xs text-slate-500">Photographs preserved in the memorial</p>
+                </div>
+            </div>
+
+            <div id="photoGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mb-3 text-xl"></i>
+                    <p>Loading memorial photographs...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="photoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm" onclick="closeModal()">
+        <div class="max-w-4xl max-h-[90vh] bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col" onclick="event.stopPropagation()">
+            <div class="relative bg-black flex items-center justify-center overflow-hidden min-h-[300px]">
+                <img id="modalImg" src="" alt="Full view" class="max-h-[70vh] w-auto object-contain">
+                <button onclick="closeModal()" class="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-800 text-slate-300 w-9 h-9 rounded-full flex items-center justify-center border border-slate-700 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <h3 id="modalTitle" class="text-lg font-bold text-amber-100 mb-1"></h3>
+                <p id="modalCaption" class="text-sm text-slate-400 italic"></p>
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <h2>Preserved Memories & Audio Legacy</h2>
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center">
+        <p class="text-xs text-slate-600">
+            EchoVault — Preserving memories, stories, and legacies.
+        </p>
+    </footer>
 
-        <div class="timeline-item">
-            <span class="tag">Story</span>
-            <h3>Lessons from Early Career Days</h3>
-            <p>"Always take pride in what you build. Quality and attention to detail will stand long after the code is written."</p>
-        </div>
+    <!-- JAVASCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", loadMemorial);
 
-        <div class="timeline-item">
-            <span class="tag">Motivational</span>
-            <h3>Message to My Family</h3>
-            <p>"Keep pushing forward, stay resilient, and look out for one another."</p>
-        </div>
-    </div>
+        async function loadMemorial() {
+            await Promise.all([
+                fetchMemorialLetters(),
+                fetchMemorialPhotos()
+            ]);
+        }
+
+        /* LOAD MEMORIAL LETTERS */
+        async function fetchMemorialLetters() {
+            const container = document.getElementById("memorialGrid");
+            const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
+
+            const headers = {};
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            try {
+                const response = await fetch("/api/letters/memorial", { headers });
+
+                if (!response.ok) throw new Error("Failed to fetch memorial letters");
+
+                const letters = await response.json();
+
+                if (!letters || letters.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
+                            <i class="fa-solid fa-feather-pointed text-2xl text-amber-400/50 mb-3"></i>
+                            <p>No public tributes on the Memorial Wall yet.</p>
+                            <p class="text-xs text-slate-600 mt-2">
+                                Create a note in your Vault and publish it to the Public Memorial Wall.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = letters.map(letter => {
+                    const dateStr = letter.createdAt
+                        ? new Date(letter.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                          })
+                        : "Preserved Memory";
+
+                    return `
+                        <article class="bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/50 rounded-xl p-6 shadow-lg transition duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-amber-400 text-xs mb-4">
+                                    <i class="fa-solid fa-quote-left"></i>
+                                    <span>${escapeHtml(dateStr)}</span>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-amber-100 leading-snug mb-3">
+                                    ${escapeHtml(letter.title || letter.subject || "In Remembrance")}
+                                </h3>
+
+                                <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto pr-1">
+                                    ${escapeHtml(letter.content || letter.bodyContent || "")}
+                                </div>
+                            </div>
+
+                            ${letter.recipientName ? `
+                                <div class="pt-4 mt-5 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between gap-4">
+                                    <span>Dedicated to:</span>
+                                    <span class="font-semibold text-slate-200 text-right">
+                                        ${escapeHtml(letter.recipientName)}
+                                    </span>
+                                </div>
+                            ` : ""}
+                        </article>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                console.error("Error loading memorial letters:", error);
+                container.innerHTML = `
+                    <div class="col-span-full p-8 text-center text-rose-400 border border-rose-900/50 bg-rose-950/20 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation mb-2"></i>
+                        <p>Failed to load memorial tributes.</p>
+                    </div>
+                `;
+            }
+        }
+
+        /* LOAD MEMORIAL PHOTOS */
+        async function fetchMemorialPhotos() {
+            const container = document.getElementById("photoGrid");
+            const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
+
+            const headers = {};
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            try {
+                const response = await fetch("/api/photos/public", { headers });
+
+                if (!response.ok) throw new Error("Failed to fetch memorial photos");
+
+                const photos = await response.json();
+
+                if (!photos || photos.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
+                            <i class="fa-solid fa-images text-2xl text-amber-400/50 mb-3"></i>
+                            <p>No memorial photographs have been added yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = photos.map(photo => {
+                    const title = photo.title || "Untitled Memory";
+
+                    return `
+                        <article onclick="openModal('${escapeAttribute(photo.imageUrl)}', '${escapeAttribute(title)}', '${escapeAttribute(photo.caption || '')}')" 
+                                 class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 cursor-pointer">
+                            <div class="relative bg-slate-950 overflow-hidden">
+                                <img src="${escapeAttribute(photo.imageUrl)}" alt="${escapeAttribute(title)}" loading="lazy" class="w-full h-64 object-cover transition duration-500 hover:scale-105">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+                            </div>
+                            <div class="p-5">
+                                <h3 class="text-lg font-semibold text-amber-100 mb-1">
+                                    ${escapeHtml(title)}
+                                </h3>
+                                ${photo.caption ? `
+                                    <p class="text-sm text-slate-400 italic line-clamp-2">
+                                        "${escapeHtml(photo.caption)}"
+                                    </p>
+                                ` : ""}
+                            </div>
+                        </article>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                console.error("Error loading memorial photos:", error);
+                container.innerHTML = `
+                    <div class="col-span-full p-8 text-center text-rose-400 border border-rose-900/50 bg-rose-950/20 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation mb-2"></i>
+                        <p>Failed to load memorial photographs.</p>
+                    </div>
+                `;
+            }
+        }
+
+        /* LIGHTBOX FUNCTIONS */
+        function openModal(url, title, caption) {
+            document.getElementById("modalImg").src = url;
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalCaption").textContent = caption ? `"${caption}"` : "";
+            const modal = document.getElementById("photoModal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("photoModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        /* SECURITY ESCAPING */
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace font-medium
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeAttribute(value) {
+            return escapeHtml(value);
+        }
+    </script>
 </body>
 </html>

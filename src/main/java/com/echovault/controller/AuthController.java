@@ -1,10 +1,13 @@
 package com.echovault.controller;
 
 import com.echovault.dto.AuthRequest;
+import com.echovault.dto.AuthResponse;
 import com.echovault.dto.RegisterRequest;
 import com.echovault.model.User;
 import com.echovault.repository.UserRepository;
+import com.echovault.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -19,37 +22,48 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Email is already registered."));
         }
 
+        String assignedRole = (request.getRole() != null && !request.getRole().isBlank()) 
+                ? request.getRole() 
+                : "ROLE_USER";
+
         User user = User.builder()
-                .name(request.getName())
+                .fullName(request.getFullName())
                 .email(request.getEmail())
-                .username(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .createdAt(LocalDateTime.now())
+                .role(assignedRole)
+                .lastLoginAt(LocalDateTime.now())
                 .build();
 
-        userRepository.save(user);
-        return ResponseEntity.ok(Map.of("userId", user.getId(), "message", "User registered successfully"));
+        User savedUser = userRepository.save(user);
+        String token = jwtUtils.generateToken(savedUser.getEmail());
+
+        return ResponseEntity.ok(new AuthResponse(token, savedUser.getId(), savedUser.getEmail(), savedUser.getRole()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElse(null);
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid email or password."));
         }
 
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        return ResponseEntity.ok(Map.of("userId", user.getId(), "email", user.getEmail()));
+        String token = jwtUtils.generateToken(user.getEmail());
+
+        return ResponseEntity.ok(new AuthResponse(token, user.getId(), user.getEmail(), user.getRole()));
     }
 }

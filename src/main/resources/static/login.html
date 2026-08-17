@@ -112,11 +112,15 @@
             text-align: center;
             font-size: 0.85rem;
             color: #94a3b8;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .footer-links a {
             color: #38bdf8;
             text-decoration: none;
+            font-weight: 500;
         }
 
         .footer-links a:hover {
@@ -147,7 +151,8 @@
         </form>
 
         <div class="footer-links">
-            <p>Authorized access only</p>
+            <p>Don't have an account? <a href="/register.html">Create one here</a></p>
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Authorized access only</p>
         </div>
     </div>
 
@@ -174,21 +179,27 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
+                let data = {};
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                }
 
                 if (response.ok) {
-                    if (data.token) {
-                        localStorage.setItem('token', data.token);
-                    }
-                    if (data.userId) {
-                        localStorage.setItem('userId', data.userId);
-                    }
+                    const token = data.token || data.jwtToken || data.accessToken;
+                    const userId = data.id || data.userId;
+
+                    if (token) localStorage.setItem('jwtToken', token);
+                    if (data.role) localStorage.setItem('userRole', data.role);
+                    if (userId) localStorage.setItem('userId', userId);
+
                     window.location.href = '/dashboard.html';
                 } else {
-                    errorDiv.textContent = data.message || 'Invalid email or password.';
+                    errorDiv.textContent = data.error || data.message || 'Invalid email or password.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
+                console.error('Network failure:', error);
                 errorDiv.textContent = 'Connection error. Please ensure the server is running.';
                 errorDiv.style.display = 'block';
             } finally {

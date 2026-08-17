@@ -1,11 +1,17 @@
 package com.echovault.model;
 
 public enum Tag {
+    GENERAL,
+    MOTIVATIONAL,
+    MEMORIAL,
+    LEGACY,
     PERSONAL,
     FAMILY,
-    WORK,
-    EMERGENCY,
-    MEMORY,
-    CONFIDENTIAL,
-    OTHER
+    INSPIRATIONAL,
+    TIME_CAPSULE,
+    LOVE,
+    STORY,
+    WARNING,
+    FAITH,
+    CELEBRATION
 }
