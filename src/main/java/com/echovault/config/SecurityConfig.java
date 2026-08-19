@@ -30,11 +30,10 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-            // Disable frame options to allow H2 Console to render inside browser iframes
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. Public Frontend Views, Static Assets & H2 Console
+                // 1. Static Assets & Frontend Page Routes
                 .requestMatchers(
                     "/", 
                     "/*.html", 
@@ -46,27 +45,70 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
 
-                // 2. Public Authentication & Emergency Unlocking
+                // 2. Authentication & Emergency Unlock Trigger
                 .requestMatchers("/api/auth/**", "/api/emergency/unlock").permitAll()
 
-                // 3. Photo Endpoints - Temporarily Permitted for Testing
-                .requestMatchers("/api/photos/**", "/api/photographs/**").permitAll()
-
-                // 4. Admin-Only Endpoints
+                // 3. Admin Operations
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
-                // 5. Emergency Question Configuration
-                .requestMatchers("/api/emergency/recovery-question").hasAnyAuthority("USER", "ROLE_USER")
-
-                // 6. Vault & Letter Operations
-                .requestMatchers(HttpMethod.GET, "/api/letters/**", "/vault/letter/**", "/api/voice-notes/**", "/api/ghost-chat/**", "/api/memorial/**")
-                    .permitAll()
-                
-                .requestMatchers(HttpMethod.POST, "/api/letters/**", "/vault/letter/**", "/api/voice-notes/**")
-                    .permitAll()
-                
-                .requestMatchers(HttpMethod.DELETE, "/api/letters/**", "/vault/letter/**", "/api/voice-notes/**")
+                // 4. Emergency Configuration (User Only)
+                .requestMatchers("/api/emergency/recovery-question", "/api/user/settings/**")
                     .hasAnyAuthority("USER", "ROLE_USER")
+
+                // 5. Read-Only Access (GET) for Vault, Memorial, Ghost Engine & Voice Notes
+                .requestMatchers(HttpMethod.GET, 
+                    "/api/letters/**", 
+                    "/vault/letter/**", 
+                    "/api/vault/**",
+                    "/api/memorial/**", 
+                    "/api/ghost-chat/**", 
+                    "/api/ghost/**",
+                    "/api/voice-notes/**",
+                    "/api/photos/**", 
+                    "/api/photographs/**"
+                ).hasAnyAuthority(
+                    "USER", "ROLE_USER", 
+                    "FAMILY", "ROLE_FAMILY", 
+                    "FAMILY_MEMBER", "ROLE_FAMILY_MEMBER", 
+                    "ADMIN", "ROLE_ADMIN"
+                )
+
+                // 6. Interactive AI Ghost Chat Access (POST)
+                // Allows family members to send chat prompts to the Ghost Persona
+                .requestMatchers(HttpMethod.POST, 
+                    "/api/ghost-chat/**",
+                    "/api/ghost/**"
+                ).hasAnyAuthority(
+                    "USER", "ROLE_USER", 
+                    "FAMILY", "ROLE_FAMILY", 
+                    "FAMILY_MEMBER", "ROLE_FAMILY_MEMBER", 
+                    "ADMIN", "ROLE_ADMIN"
+                )
+
+                // 7. Write/Modify Operations (POST, PUT, DELETE)
+                // Restricted to account owner only
+                .requestMatchers(HttpMethod.POST, 
+                    "/api/letters/**", 
+                    "/vault/letter/**", 
+                    "/api/vault/**",
+                    "/api/voice-notes/**",
+                    "/api/photos/**"
+                ).hasAnyAuthority("USER", "ROLE_USER")
+
+                .requestMatchers(HttpMethod.PUT, 
+                    "/api/letters/**", 
+                    "/vault/letter/**", 
+                    "/api/vault/**",
+                    "/api/voice-notes/**"
+                ).hasAnyAuthority("USER", "ROLE_USER")
+
+                .requestMatchers(HttpMethod.DELETE, 
+                    "/api/letters/**", 
+                    "/vault/letter/**", 
+                    "/api/vault/**",
+                    "/api/voice-notes/**",
+                    "/api/photos/**"
+                ).hasAnyAuthority("USER", "ROLE_USER")
 
                 .anyRequest().authenticated()
             )

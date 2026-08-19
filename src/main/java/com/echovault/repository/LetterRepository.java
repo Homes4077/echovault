@@ -13,9 +13,11 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
 
     List<Letter> findByUser(User user);
 
+    List<Letter> findByUser_Email(String email);
+
     List<Letter> findByUserOrderByCreatedAtDesc(User user);
 
-    List<Letter> findByIsPublicTrueOrderByCreatedAtDesc();
+    List<Letter> findByIsPublicTrueAndIsDeliveredTrueOrderByCreatedAtDesc();
 
     List<Letter> findAllByIsDeliveredFalseAndScheduledDeliveryAtBefore(LocalDateTime dateTime);
 }

@@ -24,7 +24,6 @@ public class EmailService {
 
     @Async
     public void sendScheduledLetter(String toEmail, String subject, String content, String recipientName) {
-        // Skip API calls if the key is empty, null, or using the default dummy placeholder
         if (sendGridApiKey == null || sendGridApiKey.isBlank() || sendGridApiKey.contains("dummy")) {
             log.warn("SendGrid dispatch skipped: SENDGRID_API_KEY is unconfigured or set to dummy placeholder.");
             return;
@@ -49,9 +48,14 @@ public class EmailService {
             request.setBody(mail.build());
 
             Response response = sg.api(request);
-            log.info("SendGrid email dispatch status: {} for recipient: {}", response.getStatusCode(), toEmail);
+            
+            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                log.info("SendGrid email dispatched successfully (Status {}) to recipient: {}", response.getStatusCode(), toEmail);
+            } else {
+                log.error("SendGrid dispatch failed! Status: {}, Response Body: {}", response.getStatusCode(), response.getBody());
+            }
         } catch (Exception ex) {
-            log.error("Failed to send SendGrid email to {}: {}", toEmail, ex.getMessage(), ex);
+            log.error("Failed to execute SendGrid API call for {}: {}", toEmail, ex.getMessage(), ex);
         }
     }
 }

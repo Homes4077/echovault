@@ -35,6 +35,12 @@ public class LetterService {
                              String tagStr, boolean isPublic, LocalDateTime scheduledDeliveryAt) {
         
         User user = getAuthenticatedUser();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime deliveryTime = scheduledDeliveryAt != null ? scheduledDeliveryAt : now;
+
+        // FIXED: Letters MUST start as false so SendGrid/Scheduler picks them up.
+        // Never auto-mark as true here, even if scheduled for right now.
+        boolean isDelivered = false;
 
         String displayTitle = (title == null || title.trim().isEmpty()) ? "Untitled Note" : title;
 
@@ -56,9 +62,9 @@ public class LetterService {
                 .recipientEmail(recipientEmail)
                 .tag(parsedTag)
                 .isPublic(isPublic)
-                .isDelivered(false)
-                .scheduledDeliveryAt(scheduledDeliveryAt != null ? scheduledDeliveryAt : LocalDateTime.now())
-                .createdAt(LocalDateTime.now())
+                .isDelivered(isDelivered)
+                .scheduledDeliveryAt(deliveryTime)
+                .createdAt(now)
                 .user(user)
                 .build();
 
@@ -67,19 +73,12 @@ public class LetterService {
 
     public List<Letter> getUserVaultLetters() {
         User user = getAuthenticatedUser();
-        List<Letter> letters = letterRepository.findByUserOrderByCreatedAtDesc(user);
-
-        LocalDateTime now = LocalDateTime.now();
-        for (Letter letter : letters) {
-            if (!letter.isDelivered() && letter.getScheduledDeliveryAt() != null && !letter.getScheduledDeliveryAt().isAfter(now)) {
-                letter.setDelivered(true);
-                letterRepository.save(letter);
-            }
-        }
-        return letters;
+        // FIXED: Pure read query. Removed side-effect loop that was prematurely flipping isDelivered to true.
+        return letterRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
     public List<Letter> getMemorialLetters() {
-        return letterRepository.findByIsPublicTrueOrderByCreatedAtDesc();
+        // FIXED: Pure read query. Removed side-effect mutation during GET request.
+        return letterRepository.findByIsPublicTrueAndIsDeliveredTrueOrderByCreatedAtDesc();
     }
 }

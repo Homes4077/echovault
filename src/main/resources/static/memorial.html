@@ -6,6 +6,7 @@
     <title>EchoVault — Memorial Wall</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="/js/auth-check.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30">
 
@@ -16,10 +17,13 @@
                 <i class="fa-solid fa-ribbon text-amber-500"></i>
                 EchoVault
             </a>
-            <div class="flex gap-6 text-sm font-medium">
+            <div class="flex gap-6 text-sm font-medium" id="navLinks">
                 <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
-                <a href="/write-letter.html" class="text-slate-400 hover:text-slate-200 transition">Write Letter</a>
-                <a href="/photos.html" class="text-slate-400 hover:text-slate-200 transition">Photos</a>
+                <a href="/write-letter.html" id="writeLetterNav" class="text-slate-400 hover:text-slate-200 transition">Write Letter</a>
+                <a href="/record-voice.html" class="text-slate-400 hover:text-slate-200 transition">Record Voice</a>
+                <a href="/ghost-chat.html" class="text-amber-400/90 hover:text-amber-300 transition flex items-center gap-1">
+                    <i class="fa-solid fa-ghost"></i> Ghost AI
+                </a>
                 <a href="/memorial.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Memorial Wall</a>
             </div>
         </div>
@@ -35,23 +39,23 @@
                 The Memorial Wall
             </h1>
             <p class="text-sm md:text-base text-slate-400 mt-3">
-                Public messages, cherished memories, photographs, and stories preserved for eternity.
+                Public messages, cherished voice memories, transcribed stories, and legacies preserved for eternity.
             </p>
         </div>
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full">
+    <main class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full space-y-14">
 
         <!-- MEMORIAL LETTERS SECTION -->
-        <section class="mb-14">
+        <section>
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
                     <i class="fa-solid fa-feather-pointed text-amber-400"></i>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-amber-100">Memorial Tributes</h2>
-                    <p class="text-xs text-slate-500">Messages and stories shared in remembrance</p>
+                    <p class="text-xs text-slate-500">Written messages and stories shared in remembrance</p>
                 </div>
             </div>
 
@@ -63,48 +67,32 @@
             </div>
         </section>
 
-        <!-- MEMORIAL PHOTOS SECTION -->
+        <!-- VOICE MEMORIES & TRANSCRIPTS SECTION -->
         <section>
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
-                    <i class="fa-solid fa-images text-amber-400"></i>
+                    <i class="fa-solid fa-microphone-lines text-amber-400"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-amber-100">Cherished Memories</h2>
-                    <p class="text-xs text-slate-500">Photographs preserved in the memorial</p>
+                    <h2 class="text-xl font-bold text-amber-100">Voice Memories & Transcripts</h2>
+                    <p class="text-xs text-slate-500">Audio recordings preserved with real-time text transcriptions</p>
                 </div>
             </div>
 
-            <div id="photoGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="voiceNotesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
                     <i class="fa-solid fa-spinner fa-spin text-amber-400 mb-3 text-xl"></i>
-                    <p>Loading memorial photographs...</p>
+                    <p>Loading voice memories...</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- LIGHTBOX MODAL -->
-    <div id="photoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm" onclick="closeModal()">
-        <div class="max-w-4xl max-h-[90vh] bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col" onclick="event.stopPropagation()">
-            <div class="relative bg-black flex items-center justify-center overflow-hidden min-h-[300px]">
-                <img id="modalImg" src="" alt="Full view" class="max-h-[70vh] w-auto object-contain">
-                <button onclick="closeModal()" class="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-800 text-slate-300 w-9 h-9 rounded-full flex items-center justify-center border border-slate-700 transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="p-5">
-                <h3 id="modalTitle" class="text-lg font-bold text-amber-100 mb-1"></h3>
-                <p id="modalCaption" class="text-sm text-slate-400 italic"></p>
-            </div>
-        </div>
-    </div>
-
     <!-- FOOTER -->
     <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center">
         <p class="text-xs text-slate-600">
-            EchoVault — Preserving memories, stories, and legacies.
+            EchoVault — Preserving memories, audio recordings, and legacies.
         </p>
     </footer>
 
@@ -115,7 +103,7 @@
         async function loadMemorial() {
             await Promise.all([
                 fetchMemorialLetters(),
-                fetchMemorialPhotos()
+                fetchVoiceNotes()
             ]);
         }
 
@@ -148,8 +136,8 @@
                 }
 
                 container.innerHTML = letters.map(letter => {
-                    const dateStr = letter.createdAt
-                        ? new Date(letter.createdAt).toLocaleDateString(undefined, {
+                    const dateStr = letter.deliveredAt || letter.createdAt
+                        ? new Date(letter.deliveredAt || letter.createdAt).toLocaleDateString(undefined, {
                             year: "numeric",
                             month: "long",
                             day: "numeric"
@@ -169,7 +157,7 @@
                                 </h3>
 
                                 <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto pr-1">
-                                    ${escapeHtml(letter.content || letter.bodyContent || "")}
+                                    ${escapeHtml(letter.bodyContent || letter.content || "")}
                                 </div>
                             </div>
 
@@ -196,80 +184,85 @@
             }
         }
 
-        /* LOAD MEMORIAL PHOTOS */
-        async function fetchMemorialPhotos() {
-            const container = document.getElementById("photoGrid");
+        /* LOAD VOICE MEMORIES */
+        async function fetchVoiceNotes() {
+            const container = document.getElementById("voiceNotesGrid");
             const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
 
             const headers = {};
             if (token) headers["Authorization"] = "Bearer " + token;
 
             try {
-                const response = await fetch("/api/photos/public", { headers });
+                const response = await fetch("/api/voice-notes", { headers });
 
-                if (!response.ok) throw new Error("Failed to fetch memorial photos");
+                if (!response.ok) throw new Error("Failed to fetch voice notes");
 
-                const photos = await response.json();
+                const voiceNotes = await response.json();
 
-                if (!photos || photos.length === 0) {
+                if (!voiceNotes || voiceNotes.length === 0) {
                     container.innerHTML = `
                         <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                            <i class="fa-solid fa-images text-2xl text-amber-400/50 mb-3"></i>
-                            <p>No memorial photographs have been added yet.</p>
+                            <i class="fa-solid fa-microphone text-2xl text-amber-400/50 mb-3"></i>
+                            <p>No voice memories recorded on the Memorial Wall yet.</p>
+                            <p class="text-xs text-slate-600 mt-2">
+                                Record audio notes to preserve spoken memories and automated transcripts.
+                            </p>
                         </div>
                     `;
                     return;
                 }
 
-                container.innerHTML = photos.map(photo => {
-                    const title = photo.title || "Untitled Memory";
+                container.innerHTML = voiceNotes.map(note => {
+                    const dateStr = note.createdAt
+                        ? new Date(note.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                          })
+                        : "Preserved Memory";
 
                     return `
-                        <article onclick="openModal('${escapeAttribute(photo.imageUrl)}', '${escapeAttribute(title)}', '${escapeAttribute(photo.caption || '')}')" 
-                                 class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 cursor-pointer">
-                            <div class="relative bg-slate-950 overflow-hidden">
-                                <img src="${escapeAttribute(photo.imageUrl)}" alt="${escapeAttribute(title)}" loading="lazy" class="w-full h-64 object-cover transition duration-500 hover:scale-105">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-                            </div>
-                            <div class="p-5">
-                                <h3 class="text-lg font-semibold text-amber-100 mb-1">
-                                    ${escapeHtml(title)}
+                        <article class="bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/50 rounded-xl p-6 shadow-lg transition duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-xs mb-3">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-medium border border-amber-500/20">
+                                        <i class="fa-solid fa-microphone mr-1"></i> ${escapeHtml(note.tag || "MOTIVATIONAL")}
+                                    </span>
+                                    <span class="text-slate-500">${escapeHtml(dateStr)}</span>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-amber-100 leading-snug mb-3">
+                                    ${escapeHtml(note.title || "Untitled Voice Memory")}
                                 </h3>
-                                ${photo.caption ? `
-                                    <p class="text-sm text-slate-400 italic line-clamp-2">
-                                        "${escapeHtml(photo.caption)}"
+
+                                <!-- Audio Player -->
+                                <div class="my-3 bg-slate-950 p-2 rounded-lg border border-slate-800">
+                                    <audio controls src="${escapeAttribute(note.audioUrl || '')}" class="w-full h-8"></audio>
+                                </div>
+
+                                <!-- Transcript Section -->
+                                <div class="mt-3 bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 text-xs text-slate-300">
+                                    <div class="text-[10px] text-amber-400/80 font-mono mb-1 uppercase tracking-wider flex items-center gap-1">
+                                        <i class="fa-solid fa-file-lines"></i> Transcript
+                                    </div>
+                                    <p class="italic leading-relaxed">
+                                        "${escapeHtml(note.transcript || "No transcript generated for this voice memory.")}"
                                     </p>
-                                ` : ""}
+                                </div>
                             </div>
                         </article>
                     `;
                 }).join("");
 
             } catch (error) {
-                console.error("Error loading memorial photos:", error);
+                console.error("Error loading voice notes:", error);
                 container.innerHTML = `
                     <div class="col-span-full p-8 text-center text-rose-400 border border-rose-900/50 bg-rose-950/20 rounded-xl">
                         <i class="fa-solid fa-triangle-exclamation mb-2"></i>
-                        <p>Failed to load memorial photographs.</p>
+                        <p>Failed to load voice memories.</p>
                     </div>
                 `;
             }
-        }
-
-        /* LIGHTBOX FUNCTIONS */
-        function openModal(url, title, caption) {
-            document.getElementById("modalImg").src = url;
-            document.getElementById("modalTitle").textContent = title;
-            document.getElementById("modalCaption").textContent = caption ? `"${caption}"` : "";
-            const modal = document.getElementById("photoModal");
-            modal.classList.remove("hidden");
-            modal.classList.add("flex");
-        }
-
-        function closeModal() {
-            const modal = document.getElementById("photoModal");
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
         }
 
         /* SECURITY ESCAPING */
@@ -277,7 +270,6 @@
             return String(value ?? "")
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace font-medium
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");

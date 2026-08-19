@@ -10,13 +10,11 @@ public class GhostEngineService {
     private final GeminiGhostEngineService geminiGhostEngineService;
 
     public String processQuery(String userEmail, String prompt) {
-        if (geminiGhostEngineService != null) {
-            try {
-                return geminiGhostEngineService.generateResponse(userEmail, prompt);
-            } catch (Exception e) {
-                // Fallback response if engine execution fails
-            }
+        try {
+            return geminiGhostEngineService.generateResponse(userEmail, prompt);
+        } catch (Exception e) {
+            System.err.println("Error processing Ghost Engine Query: " + e.getMessage());
+            return "I am having trouble connecting to my memory vault at the moment. Please try again shortly.";
         }
-        return "Ghost Engine: Memory query logged for " + userEmail;
     }
 }

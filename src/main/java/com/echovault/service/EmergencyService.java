@@ -2,39 +2,42 @@ package com.echovault.service;
 
 import com.echovault.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmergencyService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder; // Injected if BCrypt is configured
 
-    public Map<String, Object> verifyAndGenerateAccess(String email, String answer) {
-        Map<String, Object> result = new HashMap<>();
-        
-        // Basic emergency validation check
-        boolean isValid = userRepository.findByEmail(email)
-                .isPresent(); // Customize with exact security answer entity logic if required
-
-        if (isValid) {
-            result.put("status", "SUCCESS");
-            result.put("accessKey", "EMERGENCY-TEMP-TOKEN-" + System.currentTimeMillis());
-            result.put("message", "Emergency protocols verified.");
-        } else {
-            result.put("status", "FAILED");
-            result.put("message", "Verification failed.");
+    public boolean saveSecurityQuestion(String userEmail, String question, String answer) {
+        if (userEmail == null || question == null || answer == null || answer.isBlank()) {
+            return false;
         }
-        return result;
+
+        String normalizedAnswer = answer.trim().toLowerCase();
+
+        return userRepository.findByEmail(userEmail).map(user -> {
+            user.setSecurityQuestion(question.trim());
+            // Optional: Use passwordEncoder.encode(normalizedAnswer) for hashing
+            user.setSecurityAnswer(passwordEncoder.encode(normalizedAnswer)); 
+            userRepository.save(user);
+            return true;
+        }).orElse(false);
     }
 
-    public void saveSecurityQuestion(String userEmail, String question, String answer) {
-        userRepository.findByEmail(userEmail).ifPresent(user -> {
-            // Persist emergency question & answer to user record
-            userRepository.save(user);
-        });
+    public boolean verifyEmergencyAccess(String userEmail, String accessCode) {
+        if (userEmail == null || accessCode == null || accessCode.isBlank()) {
+            return false;
+        }
+
+        String normalizedCode = accessCode.trim().toLowerCase();
+
+        return userRepository.findByEmail(userEmail)
+                .map(user -> user.getSecurityAnswer() != null && 
+                             passwordEncoder.matches(normalizedCode, user.getSecurityAnswer()))
+                .orElse(false);
     }
 }

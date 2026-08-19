@@ -34,6 +34,10 @@ public class User implements UserDetails {
 
     private LocalDateTime lastLoginAt;
 
+    // Emergency protocol fields
+    private String securityQuestion;
+    private String securityAnswer;
+
     // Helper method to maintain backwards compatibility with getName() calls
     public String getName() {
         return this.fullName;

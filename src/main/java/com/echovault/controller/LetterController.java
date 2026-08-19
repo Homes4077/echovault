@@ -94,7 +94,7 @@ public class LetterController {
         try {
             return LocalDateTime.parse(isoFormatted);
         } catch (DateTimeParseException ignored) {
-            // Fall back to alternative display formats
+            // Fall back to alternative patterns
         }
 
         DateTimeFormatter[] fallbackFormatters = new DateTimeFormatter[] {
@@ -107,7 +107,7 @@ public class LetterController {
             try {
                 return LocalDateTime.parse(raw, formatter);
             } catch (DateTimeParseException ignored) {
-                // Continue checking remaining patterns
+                // Keep trying
             }
         }
 

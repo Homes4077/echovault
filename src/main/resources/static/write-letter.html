@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
                 <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
                 <a href="/photos.html" class="text-slate-400 hover:text-slate-200 transition">Photos</a>
                 <a href="/memorial.html" class="text-slate-400 hover:text-slate-200 transition">Memorial Wall</a>
-                <a href="/compose.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Write Letter</a>
+                <a href="/write-letter.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Write Letter</a>
             </div>
         </div>
     </nav>
@@ -127,6 +127,19 @@
                         class="w-full p-4 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition resize-y"></textarea>
                 </div>
 
+                <!-- Memorial Wall Public Toggle -->
+                <div class="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-lg">
+                    <div>
+                        <label for="isPublicToggle" class="text-sm font-semibold text-slate-200 cursor-pointer block">
+                            Publish to Public Memorial Wall
+                        </label>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Allow this letter to be publicly readable on the Memorial Wall once it unlocks.
+                        </p>
+                    </div>
+                    <input type="checkbox" id="isPublicToggle" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                </div>
+
                 <!-- Submit Button -->
                 <button type="submit" id="submitBtn"
                     class="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-lg hover:shadow-amber-500/20 transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
@@ -148,22 +161,38 @@
         </p>
     </footer>
 
-    <script>
+<script>
     function getStoredToken() {
-        return localStorage.getItem('jwtToken') || localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const rawToken = localStorage.getItem('jwtToken') || 
+                         localStorage.getItem('token') || 
+                         localStorage.getItem('accessToken');
+        if (rawToken) return rawToken;
+
+        const userObj = localStorage.getItem('user') || localStorage.getItem('authUser');
+        if (userObj) {
+            try {
+                const parsed = JSON.parse(userObj);
+                return parsed.token || parsed.jwtToken || parsed.accessToken || null;
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         const token = getStoredToken();
-        console.log("Current session token:", token);
 
         if (!token) {
-            console.warn("No JWT token found in localStorage.");
+            console.warn("No valid session token found. Redirecting to login...");
+            window.location.href = '/login.html?redirect=write-letter.html';
+            return;
         }
 
+        // Set default picker value to current time
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('scheduledDeliveryAt').min = now.toISOString().slice(0, 16);
+        document.getElementById('scheduledDeliveryAt').value = now.toISOString().slice(0, 16);
     });
 
     async function scheduleLetter(event) {
@@ -175,8 +204,8 @@
 
         if (!token) {
             msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
-            msgBox.innerText = 'No session token found. Please log in first.';
-            console.error("Submission blocked: missing token in localStorage.");
+            msgBox.innerText = 'Session expired. Redirecting to login...';
+            setTimeout(() => window.location.href = '/login.html', 1500);
             return;
         }
 
@@ -187,18 +216,25 @@
 
         const dateValue = document.getElementById('scheduledDeliveryAt').value;
         const formattedDate = dateValue ? (dateValue.length === 16 ? dateValue + ':00' : dateValue) : null;
+        const subjectVal = document.getElementById('subject').value.trim();
+        const contentVal = document.getElementById('bodyContent').value;
+        const tagVal = document.getElementById('tag').value;
 
+        // Dual-mapped keys ensure compatibility regardless of backend DTO naming
         const payload = {
             recipientName: document.getElementById('recipientName').value.trim(),
             recipientEmail: document.getElementById('recipientEmail').value.trim(),
-            subject: document.getElementById('subject').value.trim(),
-            tag: document.getElementById('tag').value,
+            title: subjectVal,
+            subject: subjectVal,
+            content: contentVal,
+            bodyContent: contentVal,
+            tag: tagVal,
+            tagStr: tagVal,
             scheduledDeliveryAt: formattedDate,
-            bodyContent: document.getElementById('bodyContent').value
+            isPublic: document.getElementById('isPublicToggle').checked
         };
 
         try {
-            console.log("Sending payload to backend with Bearer token...");
             const response = await fetch('/vault/letter/compose', {
                 method: 'POST',
                 headers: {
@@ -208,23 +244,30 @@
                 body: JSON.stringify(payload)
             });
 
-            console.log("Backend response status:", response.status);
-
             if (response.ok) {
                 msgBox.className = 'text-center font-medium text-sm pt-2 text-emerald-400';
-                msgBox.innerText = '🔒 Letter scheduled and locked in vault successfully!';
+                msgBox.innerText = '🔒 Letter scheduled and saved successfully!';
                 document.getElementById('composeForm').reset();
+                
+                // Re-populate default date/time after reset
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('scheduledDeliveryAt').value = now.toISOString().slice(0, 16);
+            } else if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('token');
+                msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+                msgBox.innerText = 'Session expired or invalid token. Please log in again.';
+                setTimeout(() => window.location.href = '/login.html', 2000);
             } else {
                 const errText = await response.text();
-                console.error(`HTTP ${response.status} Error details:`, errText);
-                
                 msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
-                msgBox.innerText = `Server Error (${response.status}): ${errText || 'Unauthorized access'}`;
+                msgBox.innerText = `Server Error (${response.status}): ${errText || 'Failed to lock letter'}`;
             }
         } catch (err) {
-            console.error('Network or CORS error:', err);
+            console.error('Network error:', err);
             msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
-            msgBox.innerText = 'Network error. Check backend server and console logs.';
+            msgBox.innerText = 'Network error. Verify server status and terminal logs.';
         } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-vault"></i> <span>Lock & Schedule Letter</span>`;
