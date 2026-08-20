@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.token) {
                     localStorage.setItem('jwtToken', data.token);
                     if (data.role) localStorage.setItem('userRole', data.role);
+                    if (data.id || data.userId) localStorage.setItem('userId', data.id || data.userId);
                 }
 
                 alert('Registration successful! Redirecting to login...');
@@ -52,28 +53,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
+            const viewModeInput = document.getElementById('viewMode');
 
             const email = emailInput ? emailInput.value.trim() : '';
             const password = passwordInput ? passwordInput.value : '';
+            const viewMode = viewModeInput ? viewModeInput.value : 'USER';
 
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, viewMode })
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    alert(`Login failed: ${errorText || 'Invalid credentials'}`);
+                    let errorMessage = 'Invalid credentials';
+                    try {
+                        const errData = await response.json();
+                        errorMessage = errData.error || errData.message || errorMessage;
+                    } catch (_) {
+                        errorMessage = await response.text() || errorMessage;
+                    }
+                    alert(`Login failed: ${errorMessage}`);
                     return;
                 }
 
                 const data = await response.json();
-                if (data.token) {
-                    localStorage.setItem('jwtToken', data.token);
+                const token = data.token || data.jwtToken;
+
+                if (token) {
+                    localStorage.setItem('jwtToken', token);
                     if (data.role) localStorage.setItem('userRole', data.role);
-                    window.location.href = '/dashboard.html';
+                    if (data.id || data.userId) localStorage.setItem('userId', data.id || data.userId);
+
+                    window.location.href = data.redirectUrl || '/dashboard.html';
                 } else {
                     alert('Login succeeded, but no authorization token was returned.');
                 }
@@ -146,10 +159,11 @@ function applyFamilyRestrictions() {
 }
 
 /**
- * Global Session Guard
+ * Global Session Guard & Admin Access Verification
  */
 function checkAuthGuard() {
     const token = localStorage.getItem('jwtToken');
+    const userRole = localStorage.getItem('userRole');
     const currentPath = window.location.pathname;
 
     const publicPages = [
@@ -164,8 +178,16 @@ function checkAuthGuard() {
 
     const isPublicPage = publicPages.some(page => currentPath.endsWith(page));
 
+    // Redirect unauthenticated users
     if (!token && !isPublicPage) {
         window.location.href = '/login.html';
+        return;
+    }
+
+    // Protect Admin paths from non-admin logged-in users
+    if (currentPath.includes('/admin/') && !['ROLE_ADMIN', 'ADMIN'].includes(userRole)) {
+        alert('Access denied: System Administrator privileges required.');
+        window.location.href = '/dashboard.html';
     }
 }
 

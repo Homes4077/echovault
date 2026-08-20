@@ -47,6 +47,15 @@ public class User implements UserDetails {
         this.fullName = name;
     }
 
+    // Explicit alias getters to ensure compilation compatibility
+    public String getEmergencyQuestion() {
+        return this.securityQuestion;
+    }
+
+    public String getEmergencyAnswer() {
+        return this.securityAnswer;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role != null ? role : "ROLE_USER"));

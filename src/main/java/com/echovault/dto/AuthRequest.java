@@ -14,6 +14,8 @@ public class AuthRequest {
     private String email;
     private String username;
     private String password;
+    private String viewMode; // "USER", "FAMILY", or "ADMIN"
+  private String securityAnswer;
 
     // Fallback getter if frontend submits 'username' instead of 'email'
     public String getEmail() {
@@ -21,5 +23,13 @@ public class AuthRequest {
             return email;
         }
         return username;
+    }
+
+    // Fallback getter to guarantee a default mode if omitted
+    public String getViewMode() {
+        if (viewMode != null && !viewMode.isBlank()) {
+            return viewMode;
+        }
+        return "USER";
     }
 }

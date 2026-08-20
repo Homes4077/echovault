@@ -33,11 +33,13 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. Static Assets & Frontend Page Routes
+                // 1. Static Assets & Frontend Page Routes (Subdirectories included)
                 .requestMatchers(
                     "/", 
                     "/*.html", 
-                    "/css/**", 
+                    "/admin/**",       // Allows loading /admin/dashboard.html in browser
+                  "/error",
+                  "/css/**", 
                     "/js/**", 
                     "/images/**", 
                     "/uploads/**", 
@@ -48,7 +50,7 @@ public class SecurityConfig {
                 // 2. Authentication & Emergency Unlock Trigger
                 .requestMatchers("/api/auth/**", "/api/emergency/unlock").permitAll()
 
-                // 3. Admin Operations
+                // 3. Admin Operations (Strict Backend REST Protection)
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
                 // 4. Emergency Configuration (User Only)
@@ -74,7 +76,6 @@ public class SecurityConfig {
                 )
 
                 // 6. Interactive AI Ghost Chat Access (POST)
-                // Allows family members to send chat prompts to the Ghost Persona
                 .requestMatchers(HttpMethod.POST, 
                     "/api/ghost-chat/**",
                     "/api/ghost/**"
@@ -86,7 +87,6 @@ public class SecurityConfig {
                 )
 
                 // 7. Write/Modify Operations (POST, PUT, DELETE)
-                // Restricted to account owner only
                 .requestMatchers(HttpMethod.POST, 
                     "/api/letters/**", 
                     "/vault/letter/**", 
