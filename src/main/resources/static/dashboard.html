@@ -4,239 +4,1005 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault - Dashboard</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Existing authentication check -->
+    <script src="/js/auth-check.js"></script>
+
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --danger-color: #f87171;
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 24px;
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
+            overflow-x: hidden;
+            cursor: none;
             min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1080px;
-            margin: 0 auto;
-        }
-
-        .navbar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 32px;
+            flex-direction: column;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 0.5px;
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+
+        a { cursor: none; }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
         }
 
-        .logo span {
-            color: var(--accent-color);
+        /* ── PARTICLES ── */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
         }
 
-        .user-controls {
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+        }
+        .nav-brand {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.4rem;
+            color: var(--candle);
+            letter-spacing: 0.05em;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
         }
-
+        .nav-brand span {
+            font-family: 'DM Mono', monospace;
+            font-style: normal;
+            color: var(--mist);
+            font-size: 0.58rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            display: block;
+            margin-top: 2px;
+        }
+        .nav-right { display: flex; align-items: center; gap: 14px; }
         .user-badge {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .btn-logout {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            color: var(--mist);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(200,184,216,0.12);
             padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
+        }
+        .btn-logout {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mist);
+            background: transparent;
+            border: 1px solid rgba(200,184,216,0.18);
+            padding: 8px 18px;
+            cursor: none;
+            transition: all 0.25s;
+        }
+        .btn-logout:hover { color: var(--rose); border-color: rgba(193,123,138,0.5); }
+
+        /* ── HERO ── */
+        .vault-hero {
+            position: relative;
+            padding: 84px 40px 56px;
+            text-align: center;
+            overflow: hidden;
+            background: var(--deep);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+        }
+        .vault-hero::before {
+            content: '';
+            position: absolute;
+            top: 20%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 520px; height: 520px;
+            background: radial-gradient(ellipse, rgba(244,201,122,0.08) 0%, rgba(244,201,122,0.02) 40%, transparent 70%);
+            pointer-events: none;
+            animation: glow 4s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+        }
+        .hero-eyebrow {
+            position: relative;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 26px;
+            display: flex; align-items: center; justify-content: center; gap: 16px;
+            opacity: 0;
+            animation: fadeUp 1s 0.2s forwards;
+        }
+        .hero-eyebrow::before, .hero-eyebrow::after {
+            content: '';
+            width: 40px; height: 1px;
+            background: linear-gradient(to right, transparent, var(--candle));
+        }
+        .hero-eyebrow::after { background: linear-gradient(to left, transparent, var(--candle)); }
+        .hero-title {
+            position: relative;
+            font-family: 'IM Fell English', serif;
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 400;
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 18px;
+            opacity: 0;
+            animation: fadeUp 1s 0.4s forwards;
+        }
+        .hero-title em { font-style: italic; color: var(--candle); }
+        .hero-quote {
+            position: relative;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--petal);
+            max-width: 620px;
+            line-height: 1.75;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeUp 1s 0.6s forwards;
         }
 
-        .btn-logout:hover {
-            color: var(--danger-color);
-            border-color: var(--danger-color);
+        /* ── VAULT GRID ── */
+        .vault-main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 64px 40px;
+            flex: 1;
+            width: 100%;
         }
-
-        .grid {
+        .vault-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 28px;
         }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 24px;
-            text-decoration: none;
-            color: inherit;
+        .vault-card {
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.08);
+            padding: 40px 32px 32px;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeUp 0.7s forwards;
+            transition: transform 0.35s ease, border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
         }
-
-        .card:hover {
+        .vault-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--candle), transparent);
+            transform: scaleX(0);
+            transition: transform 0.5s;
+        }
+        .vault-card:hover {
             transform: translateY(-4px);
-            border-color: var(--accent-color);
+            background: rgba(244,201,122,0.03);
+            border-color: rgba(244,201,122,0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        }
+        .vault-card:hover::after { transform: scaleX(1); }
+        .vault-card:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 4px;
         }
 
-        .card-icon {
-            font-size: 2rem;
-            margin-bottom: 12px;
+        .vault-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .vault-icon {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .vault-card:hover .vault-icon { background: var(--candle); color: var(--midnight); transform: scale(1.06); }
+        .vault-num {
+            font-family: 'IM Fell English', serif;
+            font-size: 2.2rem;
+            color: rgba(244,201,122,0.08);
+            line-height: 1;
         }
 
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #ffffff;
+        .vault-title {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        .vault-card:hover .vault-title { color: var(--candle); }
+        .vault-desc { font-size: 0.92rem; color: var(--mist); line-height: 1.7; }
+
+        .vault-link {
+            margin-top: 26px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(200,184,216,0.08);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--candle);
+            display: flex; align-items: center; gap: 8px;
+            transition: gap 0.25s ease;
+        }
+        .vault-card:hover .vault-link { gap: 14px; }
+
+        /* Emergency Unlock — rose variant */
+        .vault-card--alert:hover { border-color: rgba(193,123,138,0.4); }
+        .vault-card--alert:hover::after { background: linear-gradient(to right, transparent, var(--rose), transparent); }
+        .vault-card--alert .vault-icon { background: rgba(193,123,138,0.08); border-color: rgba(193,123,138,0.3); color: var(--rose); }
+        .vault-card--alert:hover .vault-icon { background: var(--rose); color: var(--midnight); }
+        .vault-card--alert:hover .vault-title { color: var(--rose); }
+        .vault-card--alert .vault-link { color: var(--rose); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .card-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-            margin-bottom: 16px;
+        /* ── FOOTER ── */
+        .vault-footer {
+            padding: 40px 24px;
+            text-align: center;
+            background: #080608;
+            border-top: 1px solid rgba(200,184,216,0.06);
+        }
+        .vault-footer p {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            color: var(--ash);
         }
 
-        .card-action {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-color);
+        @media (max-width: 640px) {
+            nav { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
+            .vault-hero { padding: 64px 24px 44px; }
+            .vault-main { padding: 48px 20px; }
+            .profile-name { display: none; }
+            .profile-chip { padding: 5px; border: none; background: transparent; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, .btn-logout, .vault-card { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+            .hero-eyebrow, .hero-title, .hero-quote, .vault-card {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .vault-hero::before { animation: none; }
+        }
+
+        /* ── PROFILE CHIP (nav) ── */
+        .profile-chip {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 5px 16px 5px 5px;
+            cursor: none;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .profile-chip:hover { border-color: rgba(244,201,122,0.35); background: rgba(244,201,122,0.05); }
+        .profile-chip:focus-visible { outline: 1px solid var(--candle); outline-offset: 3px; }
+        .profile-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 0.78rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .profile-name {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+        .profile-chip.unset .profile-avatar { border-style: dashed; }
+        .profile-chip.unset .profile-name { color: var(--candle); }
+
+        /* ── PROFILE MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(13,11,14,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: none;
+        }
+        .profile-modal-card {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            background: var(--midnight);
+            border: 1px solid rgba(200,184,216,0.14);
+            padding: 44px 36px 36px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+        }
+        .profile-modal-card::before {
+            content: 'Your Profile';
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: var(--midnight);
+            padding: 0 10px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: transparent;
+            border: none;
+            color: var(--mist);
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: none;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--candle); }
+        .modal-title {
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: 1.4rem;
+            color: var(--white);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .modal-sub {
+            font-style: italic;
+            font-size: 0.88rem;
+            color: var(--petal);
+            text-align: center;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .photo-upload-zone { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 26px; }
+        .photo-preview {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed rgba(244,201,122,0.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            color: var(--candle);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.25s;
+        }
+        .photo-preview:hover { border-color: var(--candle); background: rgba(244,201,122,0.05); }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-hint {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(13,11,14,0.7);
+            color: var(--warm);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.25s;
+            padding: 8px;
+        }
+        .photo-preview.has-image:hover .photo-hint { opacity: 1; }
+        .photo-upload-row { display: flex; gap: 10px; }
+        .photo-btn {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: rgba(244,201,122,0.06);
+            border: 1px solid rgba(244,201,122,0.25);
+            padding: 8px 16px;
+            transition: all 0.2s;
+        }
+        .photo-btn:hover { background: rgba(244,201,122,0.14); }
+        .photo-btn.remove { color: var(--rose); background: rgba(193,123,138,0.08); border-color: rgba(193,123,138,0.3); display: none; }
+        .photo-btn.remove:hover { background: rgba(193,123,138,0.16); }
+        .photo-note { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.05em; color: var(--mist); text-align: center; }
+        .photo-error { font-size: 0.72rem; color: var(--rose); text-align: center; display: none; margin-top: 4px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 9px;
+        }
+        .username-wrap { display: flex; align-items: stretch; }
+        .username-prefix {
+            display: flex; align-items: center;
+            padding: 0 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            border-right: none;
+            color: var(--mist);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .username-wrap input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            border-left: none;
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.25s, background-color 0.25s;
+        }
+        .username-wrap input::placeholder { color: rgba(140,132,160,0.5); }
+        .username-wrap:focus-within { }
+        .username-wrap:focus-within .username-prefix { border-color: var(--candle); }
+        .username-wrap input:focus { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: transparent;
+            color: var(--candle);
+            border: 1px solid rgba(244,201,122,0.4);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: none;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover { background-color: var(--candle); color: var(--midnight); }
+        .btn-submit:disabled { background-color: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
+
+        .status-msg {
+            margin-top: 16px;
+            padding: 12px 14px;
+            font-size: 0.85rem;
+            display: none;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .status-success { background: rgba(244,201,122,0.1); color: var(--candle); border-color: rgba(244,201,122,0.35); }
+        .status-error { background: rgba(193,123,138,0.1); color: var(--rose); border-color: rgba(193,123,138,0.35); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .profile-modal-card { animation: none; }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="navbar">
-            <div class="logo">Echo<span>Vault</span></div>
-            <div class="user-controls">
-                <span class="user-badge" id="userDisplay"></span>
-                <button class="btn-logout" id="logoutBtn">Logout</button>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
+
+<!-- NAVIGATION HEADER -->
+<nav>
+    <a href="/dashboard.html" class="nav-brand">
+        <i class="fa-solid fa-ribbon"></i>
+        EchoVault
+        <span>Secure Memory System</span>
+    </a>
+
+    <div class="nav-right">
+        <button type="button" class="profile-chip unset" id="profileChip" onclick="openProfileModal()">
+            <span class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user"></i></span>
+            <span class="profile-name" id="profileName">Set Username</span>
+        </button>
+        <button id="logoutBtn" type="button" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket" style="margin-right:6px;"></i>Logout
+        </button>
+    </div>
+</nav>
+
+<!-- HERO / WELCOME BANNER -->
+<header class="vault-hero">
+    <div class="hero-eyebrow">
+        <i class="fa-solid fa-shield-halved"></i>&nbsp;Secure Memory System
+    </div>
+    <h1 class="hero-title">Vault <em>Control Center</em></h1>
+    <p class="hero-quote">
+        Manage your time-locked letters, digital media, voice recordings,
+        protected assets, emergency preferences, and memorial space.
+    </p>
+</header>
+
+<!-- MAIN DASHBOARD GRID -->
+<main class="vault-main">
+    <div class="vault-grid">
+
+        <!-- Photo Vault -->
+        <a href="/photos.html" class="vault-card" style="animation-delay:0.05s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-camera-retro"></i></div>
+                    <div class="vault-num">01</div>
+                </div>
+                <h2 class="vault-title">Photo Vault</h2>
+                <p class="vault-desc">Store, organize, and categorize personal memories and essential images.</p>
+            </div>
+            <div class="vault-link">Open Photos <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Write Letter -->
+        <a href="/write-letter.html" class="vault-card" style="animation-delay:0.1s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                    <div class="vault-num">02</div>
+                </div>
+                <h2 class="vault-title">Time Capsule Letter</h2>
+                <p class="vault-desc">Compose scheduled messages to be delivered to loved ones at a future date.</p>
+            </div>
+            <div class="vault-link">Write Letter <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Record Voice -->
+        <a href="/record-voice.html" class="vault-card" style="animation-delay:0.15s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div class="vault-num">03</div>
+                </div>
+                <h2 class="vault-title">Voice Notes</h2>
+                <p class="vault-desc">Record audio messages and stories preserved directly inside your vault.</p>
+            </div>
+            <div class="vault-link">Record Audio <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Vault Overview -->
+        <a href="/vault.html" class="vault-card" style="animation-delay:0.2s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-vault"></i></div>
+                    <div class="vault-num">04</div>
+                </div>
+                <h2 class="vault-title">Vault Overview</h2>
+                <p class="vault-desc">Access all your protected media, secure records, and digital assets.</p>
+            </div>
+            <div class="vault-link">View Vault <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Ghost Chat AI -->
+        <a href="/ghost-chat.html" class="vault-card" style="animation-delay:0.25s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-ghost"></i></div>
+                    <div class="vault-num">05</div>
+                </div>
+                <h2 class="vault-title">Ghost Chat AI</h2>
+                <p class="vault-desc">Interact with an AI assistant initialized on preserved personality profiles.</p>
+            </div>
+            <div class="vault-link">Start Session <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Emergency Unlock -->
+        <a href="/emergency-unlock.html" class="vault-card vault-card--alert" style="animation-delay:0.3s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-shield-cat"></i></div>
+                    <div class="vault-num">06</div>
+                </div>
+                <h2 class="vault-title">Emergency Unlock</h2>
+                <p class="vault-desc">Configure fail-safe mechanisms and emergency contacts for automated access.</p>
+            </div>
+            <div class="vault-link">Configure Settings <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+        <!-- Memorial Page -->
+        <a href="/memorial.html" class="vault-card" style="animation-delay:0.35s;">
+            <div>
+                <div class="vault-card-top">
+                    <div class="vault-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                    <div class="vault-num">07</div>
+                </div>
+                <h2 class="vault-title">Memorial Space</h2>
+                <p class="vault-desc">A dedicated space displaying archived legacy content and memories.</p>
+            </div>
+            <div class="vault-link">Visit Memorial <i class="fa-solid fa-arrow-right" style="font-size:0.6rem;"></i></div>
+        </a>
+
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="vault-footer">
+    <p>EchoVault — Preserving memories, audio recordings, and legacies.</p>
+</footer>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal" onclick="if(event.target === this) closeProfileModal();">
+    <div class="profile-modal-card">
+        <button type="button" class="modal-close" onclick="closeProfileModal()" aria-label="Close">&times;</button>
+        <h2 class="modal-title">Your Profile</h2>
+        <p class="modal-sub">Set a username and photo so your vault feels like yours.</p>
+
+        <div class="photo-upload-zone">
+            <div class="photo-preview" id="profilePhotoPreview">
+                <i class="fa-solid fa-camera" id="profilePhotoIcon"></i>
+                <div class="photo-hint">Change photo</div>
+            </div>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;">
+            <div class="photo-upload-row">
+                <button type="button" class="photo-btn" id="profileUploadBtn">Upload Photo</button>
+                <button type="button" class="photo-btn remove" id="profileRemoveBtn">Remove</button>
+            </div>
+            <div class="photo-note">JPG or PNG, up to 3MB · optional</div>
+            <div class="photo-error" id="profilePhotoError"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="profileUsernameInput">Username</label>
+            <div class="username-wrap">
+                <span class="username-prefix">@</span>
+                <input type="text" id="profileUsernameInput" required minlength="3" maxlength="20" pattern="^[a-zA-Z0-9_]+$" placeholder="margaret_w" title="3-20 characters: letters, numbers, underscores">
             </div>
         </div>
 
-        <div class="grid">
-            <!-- Photo Vault -->
-            <a href="/photos.html" class="card">
-                <div>
-                    <div class="card-icon">📷</div>
-                    <div class="card-title">Photo Vault</div>
-                    <div class="card-desc">Store, organize, and categorize personal memories and essential images.</div>
-                </div>
-                <div class="card-action">Open Photos &rarr;</div>
-            </a>
-
-            <!-- Write Letter -->
-            <a href="/write-letter.html" class="card">
-                <div>
-                    <div class="card-icon">✉️</div>
-                    <div class="card-title">Time Capsule Letter</div>
-                    <div class="card-desc">Compose scheduled messages to be delivered to loved ones at a future date.</div>
-                </div>
-                <div class="card-action">Write Letter &rarr;</div>
-            </a>
-
-            <!-- Record Voice -->
-            <a href="/record-voice.html" class="card">
-                <div>
-                    <div class="card-icon">🎙️</div>
-                    <div class="card-title">Voice Notes</div>
-                    <div class="card-desc">Record audio messages and stories preserved directly inside your vault.</div>
-                </div>
-                <div class="card-action">Record Audio &rarr;</div>
-            </a>
-
-            <!-- Memory Vault -->
-            <a href="/vault.html" class="card">
-                <div>
-                    <div class="card-icon">🔐</div>
-                    <div class="card-title">Vault Overview</div>
-                    <div class="card-desc">Access all your protected media, secure records, and digital assets.</div>
-                </div>
-                <div class="card-action">View Vault &rarr;</div>
-            </a>
-
-            <!-- Ghost Chat AI -->
-            <a href="/ghost-chat.html" class="card">
-                <div>
-                    <div class="card-icon">🤖</div>
-                    <div class="card-title">Ghost Chat AI</div>
-                    <div class="card-desc">Interact with an AI assistant initialized on preserved personality profiles.</div>
-                </div>
-                <div class="card-action">Start Session &rarr;</div>
-            </a>
-
-            <!-- Emergency Unlock -->
-            <a href="/emergency-unlock.html" class="card">
-                <div>
-                    <div class="card-icon">🚨</div>
-                    <div class="card-title">Emergency Unlock</div>
-                    <div class="card-desc">Configure fail-safe mechanisms and emergency contacts for automated access.</div>
-                </div>
-                <div class="card-action">Configure Settings &rarr;</div>
-            </a>
-
-            <!-- Memorial Page -->
-            <a href="/memorial.html" class="card">
-                <div>
-                    <div class="card-icon">🕊️</div>
-                    <div class="card-title">Memorial Space</div>
-                    <div class="card-desc">A dedicated space displaying archived legacy content and memories.</div>
-                </div>
-                <div class="card-action">Visit Memorial &rarr;</div>
-            </a>
-        </div>
+        <button type="button" class="btn-submit" id="profileSaveBtn" onclick="saveProfile()">Save Profile</button>
+        <div id="profileStatus" class="status-msg"></div>
     </div>
+</div>
 
-    <script>
-        const token = localStorage.getItem('jwtToken');
-        const userId = localStorage.getItem('userId');
+<script>
+    /*
+     * AUTHENTICATION
+     * Preserves the original dashboard behavior while also
+     * supporting the alternate "token" key from the new version.
+     */
+    const token =
+        localStorage.getItem('jwtToken') ||
+        localStorage.getItem('token');
 
-        // Redirect to login if token is absent
-        if (!token) {
-            window.location.href = '/login.html';
+    const userId = localStorage.getItem('userId');
+
+    // Redirect to login if no authentication token exists.
+    if (!token) {
+        window.location.href = '/login.html';
+    }
+
+    // Handle logout.
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        // Preserve the original behavior: clear all local auth/session data.
+        localStorage.clear();
+        window.location.href = '/login.html';
+    });
+
+    /*
+     * PROFILE CHIP — username & photo
+     * Shows whatever is cached locally right away, then tries a background
+     * refresh from the backend. The refresh endpoint below is a guess
+     * ('/api/user/profile') — point it at whatever your API actually uses;
+     * failures here are silent and just fall back to the cached values,
+     * or the "Set Username" prompt if nothing has been set yet.
+     */
+    let currentUsername = localStorage.getItem('username') || null;
+    let currentProfilePicture = localStorage.getItem('profilePicture') || null;
+    let modalPhotoData = null;
+
+    function renderProfileChip() {
+        const chip = document.getElementById('profileChip');
+        const nameEl = document.getElementById('profileName');
+        const avatarEl = document.getElementById('profileAvatar');
+
+        if (currentUsername) {
+            nameEl.textContent = '@' + currentUsername;
+            chip.classList.remove('unset');
+        } else {
+            nameEl.textContent = 'Set Username';
+            chip.classList.add('unset');
         }
 
-        // Show logged-in identity if present
-        if (userId) {
-            document.getElementById('userDisplay').textContent = `User ID: #${userId}`;
+        avatarEl.innerHTML = currentProfilePicture
+            ? `<img src="${currentProfilePicture}" alt="Profile photo">`
+            : `<i class="fa-solid fa-user"></i>`;
+    }
+    renderProfileChip();
+
+    (async () => {
+        try {
+            const res = await fetch('/api/user/profile', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.username) {
+                    currentUsername = data.username;
+                    localStorage.setItem('username', currentUsername);
+                }
+                if (data.profilePicture) {
+                    currentProfilePicture = data.profilePicture;
+                    localStorage.setItem('profilePicture', currentProfilePicture);
+                }
+                renderProfileChip();
+            }
+        } catch (err) {
+            // Backend not reachable or endpoint not implemented yet — cached/local values stand.
+        }
+    })();
+
+    function openProfileModal() {
+        modalPhotoData = currentProfilePicture;
+        document.getElementById('profileUsernameInput').value = currentUsername || '';
+        const preview = document.getElementById('profilePhotoPreview');
+        const removeBtn = document.getElementById('profileRemoveBtn');
+        if (currentProfilePicture) {
+            preview.innerHTML = `<img src="${currentProfilePicture}" alt="Profile preview"><div class="photo-hint">Change photo</div>`;
+            preview.classList.add('has-image');
+            removeBtn.style.display = 'inline-block';
+        } else {
+            preview.innerHTML = `<i class="fa-solid fa-camera" id="profilePhotoIcon"></i><div class="photo-hint">Change photo</div>`;
+            preview.classList.remove('has-image');
+            removeBtn.style.display = 'none';
+        }
+        document.getElementById('profileStatus').style.display = 'none';
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('profileModal').style.display === 'flex') {
+            closeProfileModal();
+        }
+    });
+
+    // Photo upload handling (preview + base64 encode)
+    const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+    const profilePhotoInput = document.getElementById('profilePhotoInput');
+    const profileUploadBtn = document.getElementById('profileUploadBtn');
+    const profileRemoveBtn = document.getElementById('profileRemoveBtn');
+    const profilePhotoError = document.getElementById('profilePhotoError');
+    const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
+
+    function openPhotoPicker() { profilePhotoInput.click(); }
+    profilePhotoPreview.addEventListener('click', openPhotoPicker);
+    profileUploadBtn.addEventListener('click', openPhotoPicker);
+
+    profilePhotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        profilePhotoError.style.display = 'none';
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            profilePhotoError.textContent = 'Please choose an image file.';
+            profilePhotoError.style.display = 'block';
+            profilePhotoInput.value = '';
+            return;
+        }
+        if (file.size > MAX_PHOTO_BYTES) {
+            profilePhotoError.textContent = 'Image must be smaller than 3MB.';
+            profilePhotoError.style.display = 'block';
+            profilePhotoInput.value = '';
+            return;
         }
 
-        // Handle Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.clear(); // Clears token, userRole, userId simultaneously
-            window.location.href = '/login.html';
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            modalPhotoData = ev.target.result;
+            profilePhotoPreview.innerHTML = `<img src="${modalPhotoData}" alt="Profile preview"><div class="photo-hint">Change photo</div>`;
+            profilePhotoPreview.classList.add('has-image');
+            profileRemoveBtn.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    profileRemoveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modalPhotoData = null;
+        profilePhotoInput.value = '';
+        profilePhotoPreview.classList.remove('has-image');
+        profilePhotoPreview.innerHTML = `<i class="fa-solid fa-camera" id="profilePhotoIcon"></i><div class="photo-hint">Change photo</div>`;
+        profileRemoveBtn.style.display = 'none';
+    });
+
+    async function saveProfile() {
+        const btn = document.getElementById('profileSaveBtn');
+        const status = document.getElementById('profileStatus');
+        const usernameVal = document.getElementById('profileUsernameInput').value.trim();
+
+        if (usernameVal.length < 3) {
+            status.className = 'status-msg status-error';
+            status.textContent = 'Username must be at least 3 characters.';
+            status.style.display = 'block';
+            return;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(usernameVal)) {
+            status.className = 'status-msg status-error';
+            status.textContent = 'Username can only contain letters, numbers, and underscores.';
+            status.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        status.style.display = 'none';
+
+        try {
+            // Guessed endpoint — point this at your actual profile-update route.
+            const res = await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ username: usernameVal, profilePicture: modalPhotoData })
+            });
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                throw new Error(errText || 'Failed to update profile.');
+            }
+
+            currentUsername = usernameVal;
+            currentProfilePicture = modalPhotoData;
+            localStorage.setItem('username', currentUsername);
+            if (currentProfilePicture) {
+                localStorage.setItem('profilePicture', currentProfilePicture);
+            } else {
+                localStorage.removeItem('profilePicture');
+            }
+            renderProfileChip();
+
+            status.className = 'status-msg status-success';
+            status.textContent = 'Profile updated!';
+            status.style.display = 'block';
+            setTimeout(closeProfileModal, 900);
+        } catch (err) {
+            status.className = 'status-msg status-error';
+            status.textContent = err.message || 'Network error while saving profile.';
+            status.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Save Profile';
+        }
+    }
+
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Mirrors the Echoes marketing site's atmosphere.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
         });
-    </script>
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

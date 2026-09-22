@@ -4,168 +4,442 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Write Time-Locked Letter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
+            color-scheme: dark;
+        }
 
-    <!-- Tailwind CSS & FontAwesome -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button, input, select, textarea { cursor: none; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 3px;
+        }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
+
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .brand-link {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.3rem;
+            color: var(--candle);
+            text-decoration: none;
+            letter-spacing: 0.03em;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .nav-links { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .nav-links a {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+            text-decoration: none;
+            transition: color 0.25s;
+            padding-bottom: 4px;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--candle); }
+        .nav-links a.active { border-bottom: 1px solid var(--candle); }
+        .nav-back {
+            display: flex; align-items: center; gap: 7px;
+            padding-right: 20px;
+            margin-right: 4px;
+            border-right: 1px solid rgba(200,184,216,0.14);
+            color: var(--petal) !important;
+            border-bottom: none !important;
+        }
+        .nav-back:hover { color: var(--candle) !important; }
+
+        /* ── LAYOUT ── */
+        .letter-main { max-width: 680px; margin: 0 auto; padding: 56px 24px 70px; flex: 1; width: 100%; }
+
+        .letter-card {
+            position: relative;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 40px 36px 36px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            opacity: 0;
+            animation: fadeUp 0.7s 0.1s forwards;
+        }
+        .letter-card::before {
+            content: 'Time-Locked';
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: var(--midnight);
+            padding: 0 10px;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(200,184,216,0.1);
+        }
+        .form-icon {
+            width: 46px; height: 46px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 1.1rem;
+        }
+        .form-title {
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+        .form-subtitle { font-size: 0.9rem; color: var(--petal); font-style: italic; line-height: 1.6; }
+
+        .form-field { margin-bottom: 20px; }
+        .form-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--candle);
+            display: block;
+            margin-bottom: 9px;
+        }
+        .input-icon-wrap { position: relative; }
+        .input-icon {
+            position: absolute;
+            left: 15px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--mist);
+            font-size: 0.82rem;
+            pointer-events: none;
+        }
+        .input-icon-wrap .form-input { padding-left: 40px; }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.14);
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.25s, background-color 0.25s;
+        }
+        .form-input::placeholder { color: rgba(140,132,160,0.5); }
+        .form-input:focus { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+        textarea.form-input { resize: vertical; min-height: 130px; font-style: italic; }
+
+        select.form-input {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23F4C97A' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 10px 7px;
+            padding-right: 42px;
+        }
+        select.form-input option { background-color: var(--deep); color: var(--warm); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(200,184,216,0.1);
+            border-left: 2px solid var(--candle);
+            padding: 16px 18px;
+            margin-bottom: 22px;
+        }
+        .toggle-row label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.98rem;
+            color: var(--white);
+            cursor: none;
+            display: block;
+        }
+        .toggle-row p {
+            font-size: 0.85rem;
+            color: var(--mist);
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .toggle-row input[type="checkbox"] {
+            width: 20px; height: 20px;
+            accent-color: var(--candle);
+            cursor: none;
+            flex-shrink: 0;
+        }
+
+        .btn-send {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(244,201,122,0.4);
+            color: var(--candle);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 16px;
+            transition: all 0.3s;
+            margin-top: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-send:hover { background: var(--candle); color: var(--midnight); }
+        .btn-send:disabled { background: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
+
+        .msg-line {
+            text-align: center;
+            font-size: 0.88rem;
+            padding-top: 10px;
+            min-height: 24px;
+        }
+        .msg-success { color: var(--candle); }
+        .msg-error { color: var(--rose); }
+
+        .site-footer {
+            padding: 26px 24px;
+            text-align: center;
+            background: #080608;
+            border-top: 1px solid rgba(200,184,216,0.06);
+        }
+        .site-footer p {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            color: var(--ash);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 560px) {
+            .topnav { padding: 16px 20px; }
+            .letter-main { padding: 40px 16px 60px; }
+            .letter-card { padding: 30px 22px 26px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, input, select, textarea { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+            .letter-card { animation: none; opacity: 1; }
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+<body>
 
-    <!-- NAVIGATION HEADER -->
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/vault.html" class="text-xl font-bold tracking-wider text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-hourglass-half"></i>
-                EchoVault
-            </a>
-            <div class="flex gap-6 text-sm font-medium">
-                <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
-                <a href="/photos.html" class="text-slate-400 hover:text-slate-200 transition">Photos</a>
-                <a href="/memorial.html" class="text-slate-400 hover:text-slate-200 transition">Memorial Wall</a>
-                <a href="/write-letter.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Write Letter</a>
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
+
+<!-- NAVIGATION HEADER -->
+<nav class="topnav">
+    <a href="/dashboard.html" class="brand-link">
+        <i class="fa-solid fa-ribbon"></i> EchoVault
+    </a>
+    <div class="nav-links">
+        <a href="/dashboard.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <a href="/vault.html">Vault</a>
+        <a href="/photos.html">Photos</a>
+        <a href="/memorial.html">Memorial Wall</a>
+        <a href="/write-letter.html" class="active">Write Letter</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="letter-main">
+    <div class="letter-card">
+
+        <div class="form-header">
+            <div class="form-icon"><i class="fa-solid fa-lock"></i></div>
+            <div>
+                <h1 class="form-title">Schedule Time-Locked Letter</h1>
+                <p class="form-subtitle">This letter will be locked in the vault and delivered automatically at your specified delivery time.</p>
             </div>
         </div>
-    </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="max-w-2xl mx-auto px-4 py-10 flex-1 w-full">
+        <form id="composeForm" onsubmit="scheduleLetter(event)">
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-            
-            <!-- Header Title -->
-            <div class="mb-8 border-b border-slate-800 pb-5">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center text-amber-400 text-lg">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-100">Schedule Time-Locked Letter</h1>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
-                            This letter will be locked in the vault and delivered automatically at your specified delivery time.
-                        </p>
-                    </div>
+            <div class="form-field">
+                <label for="recipientName" class="form-label">Recipient Name</label>
+                <div class="input-icon-wrap">
+                    <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="recipientName" placeholder="e.g. Jane Doe" required class="form-input">
                 </div>
             </div>
 
-            <!-- Compose Form -->
-            <form id="composeForm" onsubmit="scheduleLetter(event)" class="space-y-5">
+            <div class="form-field">
+                <label for="recipientEmail" class="form-label">Recipient Email</label>
+                <div class="input-icon-wrap">
+                    <span class="input-icon"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" id="recipientEmail" placeholder="jane@example.com" required class="form-input">
+                </div>
+            </div>
 
-                <!-- Recipient Name -->
+            <div class="form-field">
+                <label for="subject" class="form-label">Subject Line</label>
+                <div class="input-icon-wrap">
+                    <span class="input-icon"><i class="fa-solid fa-heading"></i></span>
+                    <input type="text" id="subject" placeholder="A message for your 25th birthday" required class="form-input">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="tag" class="form-label">Tag Category</label>
+                    <select id="tag" required class="form-input">
+                        <option value="MOTIVATIONAL">Motivational</option>
+                        <option value="LOVE">Love</option>
+                        <option value="STORY">Story</option>
+                        <option value="WARNING">Warning</option>
+                        <option value="FAITH">Faith</option>
+                        <option value="CELEBRATION">Celebration</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="scheduledDeliveryAt" class="form-label">Delivery Date &amp; Time</label>
+                    <input type="datetime-local" id="scheduledDeliveryAt" required class="form-input">
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label for="bodyContent" class="form-label">Letter Content</label>
+                <textarea id="bodyContent" rows="6" placeholder="Write your time-locked message here..." required class="form-input"></textarea>
+            </div>
+
+            <div class="toggle-row">
                 <div>
-                    <label for="recipientName" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Recipient Name
-                    </label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
-                            <i class="fa-solid fa-user"></i>
-                        </span>
-                        <input type="text" id="recipientName" placeholder="e.g. Jane Doe" required
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
-                    </div>
+                    <label for="isPublicToggle">Publish to Public Memorial Wall</label>
+                    <p>Allow this letter to be publicly readable on the Memorial Wall once it unlocks.</p>
                 </div>
+                <input type="checkbox" id="isPublicToggle">
+            </div>
 
-                <!-- Recipient Email -->
-                <div>
-                    <label for="recipientEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Recipient Email
-                    </label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
-                            <i class="fa-solid fa-envelope"></i>
-                        </span>
-                        <input type="email" id="recipientEmail" placeholder="jane@example.com" required
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
-                    </div>
-                </div>
+            <button type="submit" id="submitBtn" class="btn-send">
+                <i class="fa-solid fa-vault"></i>
+                <span>Lock &amp; Schedule Letter</span>
+            </button>
 
-                <!-- Subject Line -->
-                <div>
-                    <label for="subject" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Subject Line
-                    </label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
-                            <i class="fa-solid fa-heading"></i>
-                        </span>
-                        <input type="text" id="subject" placeholder="A message for your 25th birthday" required
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
-                    </div>
-                </div>
+            <div id="msg" class="msg-line"></div>
 
-                <!-- Tag & Delivery Date -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="tag" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Tag Category
-                        </label>
-                        <select id="tag" required
-                            class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition">
-                            <option value="MOTIVATIONAL">Motivational</option>
-                            <option value="LOVE">Love</option>
-                            <option value="STORY">Story</option>
-                            <option value="WARNING">Warning</option>
-                            <option value="FAITH">Faith</option>
-                            <option value="CELEBRATION">Celebration</option>
-                        </select>
-                    </div>
+        </form>
+    </div>
+</main>
 
-                    <div>
-                        <label for="scheduledDeliveryAt" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Delivery Date & Time
-                        </label>
-                        <input type="datetime-local" id="scheduledDeliveryAt" required
-                            class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition color-scheme-dark">
-                    </div>
-                </div>
-
-                <!-- Letter Content -->
-                <div>
-                    <label for="bodyContent" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Letter Content
-                    </label>
-                    <textarea id="bodyContent" rows="6" placeholder="Write your time-locked message here..." required
-                        class="w-full p-4 bg-slate-950 border border-slate-800 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-amber-400 transition resize-y"></textarea>
-                </div>
-
-                <!-- Memorial Wall Public Toggle -->
-                <div class="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-lg">
-                    <div>
-                        <label for="isPublicToggle" class="text-sm font-semibold text-slate-200 cursor-pointer block">
-                            Publish to Public Memorial Wall
-                        </label>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Allow this letter to be publicly readable on the Memorial Wall once it unlocks.
-                        </p>
-                    </div>
-                    <input type="checkbox" id="isPublicToggle" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" id="submitBtn"
-                    class="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-lg hover:shadow-amber-500/20 transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-vault"></i>
-                    <span>Lock & Schedule Letter</span>
-                </button>
-
-                <!-- Status Feedback Message -->
-                <div id="msg" class="text-center font-medium text-sm pt-2 min-h-[24px]"></div>
-
-            </form>
-        </div>
-
-    </main>
-
-    <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center">
-        <p class="text-xs text-slate-600">
-            EchoVault — Preserving memories, stories, and legacies.
-        </p>
-    </footer>
+<footer class="site-footer">
+    <p>EchoVault — Preserving memories, stories, and legacies.</p>
+</footer>
 
 <script>
     function getStoredToken() {
-        const rawToken = localStorage.getItem('jwtToken') || 
-                         localStorage.getItem('token') || 
-                         localStorage.getItem('accessToken');
+        const rawToken = localStorage.getItem('jwtToken') ||
+            localStorage.getItem('token') ||
+            localStorage.getItem('accessToken');
         if (rawToken) return rawToken;
 
         const userObj = localStorage.getItem('user') || localStorage.getItem('authUser');
@@ -189,7 +463,7 @@
             return;
         }
 
-        // Set default picker value to current time
+        // Default picker value to current time
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('scheduledDeliveryAt').value = now.toISOString().slice(0, 16);
@@ -203,7 +477,7 @@
         const token = getStoredToken();
 
         if (!token) {
-            msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+            msgBox.className = 'msg-line msg-error';
             msgBox.innerText = 'Session expired. Redirecting to login...';
             setTimeout(() => window.location.href = '/login.html', 1500);
             return;
@@ -211,25 +485,18 @@
 
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Locking Letter...</span>`;
-        msgBox.className = 'text-center font-medium text-sm pt-2 min-h-[24px]';
+        msgBox.className = 'msg-line';
         msgBox.innerText = '';
 
         const dateValue = document.getElementById('scheduledDeliveryAt').value;
         const formattedDate = dateValue ? (dateValue.length === 16 ? dateValue + ':00' : dateValue) : null;
-        const subjectVal = document.getElementById('subject').value.trim();
-        const contentVal = document.getElementById('bodyContent').value;
-        const tagVal = document.getElementById('tag').value;
 
-        // Dual-mapped keys ensure compatibility regardless of backend DTO naming
         const payload = {
             recipientName: document.getElementById('recipientName').value.trim(),
             recipientEmail: document.getElementById('recipientEmail').value.trim(),
-            title: subjectVal,
-            subject: subjectVal,
-            content: contentVal,
-            bodyContent: contentVal,
-            tag: tagVal,
-            tagStr: tagVal,
+            subject: document.getElementById('subject').value.trim(),
+            bodyContent: document.getElementById('bodyContent').value,
+            tag: document.getElementById('tag').value,
             scheduledDeliveryAt: formattedDate,
             isPublic: document.getElementById('isPublicToggle').checked
         };
@@ -245,35 +512,59 @@
             });
 
             if (response.ok) {
-                msgBox.className = 'text-center font-medium text-sm pt-2 text-emerald-400';
+                msgBox.className = 'msg-line msg-success';
                 msgBox.innerText = '🔒 Letter scheduled and saved successfully!';
                 document.getElementById('composeForm').reset();
-                
-                // Re-populate default date/time after reset
+
+                // Re-populate default date/time after form reset
                 const now = new Date();
                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                 document.getElementById('scheduledDeliveryAt').value = now.toISOString().slice(0, 16);
             } else if (response.status === 401 || response.status === 403) {
                 localStorage.removeItem('jwtToken');
                 localStorage.removeItem('token');
-                msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+                msgBox.className = 'msg-line msg-error';
                 msgBox.innerText = 'Session expired or invalid token. Please log in again.';
                 setTimeout(() => window.location.href = '/login.html', 2000);
             } else {
                 const errText = await response.text();
-                msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+                msgBox.className = 'msg-line msg-error';
                 msgBox.innerText = `Server Error (${response.status}): ${errText || 'Failed to lock letter'}`;
             }
         } catch (err) {
             console.error('Network error:', err);
-            msgBox.className = 'text-center font-medium text-sm pt-2 text-rose-400';
+            msgBox.className = 'msg-line msg-error';
             msgBox.innerText = 'Network error. Verify server status and terminal logs.';
         } finally {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-vault"></i> <span>Lock & Schedule Letter</span>`;
+            btn.innerHTML = `<i class="fa-solid fa-vault"></i> <span>Lock &amp; Schedule Letter</span>`;
         }
     }
 </script>
 
+<script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+        });
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

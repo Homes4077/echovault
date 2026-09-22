@@ -2,7 +2,6 @@ package com.echovault.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,40 +12,41 @@ import java.time.LocalDateTime;
 @Builder
 public class DeliveryLog {
 
-    public enum DeliveryType {
-        LETTER,
-        VOICE_NOTE,
-        PHOTOGRAPH,
-        EMAIL,
-        SYSTEM
-    }
-
-    public enum Status {
-        SUCCESS,
-        FAILED,
-        PENDING,
-        DELIVERED,
-        SENT
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String recipient;
-    private String recipientEmail;
-
     @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_type", columnDefinition = "VARCHAR(255)")
     private DeliveryType deliveryType;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "VARCHAR(255)")
     private Status status;
 
-    private String triggerReason;
+    private String recipient;
+    private String recipientEmail;
     private String details;
+    private String triggerReason;
     private LocalDateTime timestamp;
+
+    public enum DeliveryType {
+        EMAIL,
+        LETTER,
+        PHOTOGRAPH,
+        SYSTEM,
+        VOICE_NOTE
+    }
+
+    public enum Status {
+        DELIVERED,
+        FAILED,
+        PENDING,
+        SENT,
+        SUCCESS
+    }
 }

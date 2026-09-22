@@ -1,0 +1,98 @@
+# ==========================================
+# CUSTOM INCLUSIONS
+# ==========================================
+# Explicitly track all batch scripts
+!*.bat
+!*.sh
+
+# ==========================================
+# ENVIRONMENT & SENSITIVE DATA
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# ==========================================
+# JAVA & SPRING BOOT / GRADLE / MAVEN
+# ==========================================
+target/
+*.war
+*.ear
+*.jar
+*.rar
+build/
+.gradle/
+out/
+bin/
+!.mvn/wrapper/maven-wrapper.jar
+!.gradle/wrapper/gradle-wrapper.jar
+
+# Log files
+*.log
+logs/
+
+# ==========================================
+# NODE / JS / FRONTEND (Vite, React, etc.)
+# ==========================================
+node_modules/
+dist/
+dist-ssr/
+.cache/
+.npm/
+.eslintcache
+*.tsbuildinfo
+
+# ==========================================
+# IDEs & EDITORS
+# ==========================================
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# VS Code & Acode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# NetBeans / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ==========================================
+# OPERATING SYSTEM FILES
+# ==========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux / Termux
+*~
+.fuse_hidden*
+.directory

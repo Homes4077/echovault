@@ -4,276 +4,535 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Register</title>
+    <link href="   /css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
+        :root {
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background-color: #0f172a;
-            color: #ffffff;
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            padding: 32px 20px;
         }
+
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button, input { cursor: none; }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
+
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── CARD ── */
         .auth-card {
-            background-color: #1e293b;
-            padding: 32px;
-            border-radius: 12px;
+            position: relative;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 52px 44px 40px;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            border: 1px solid #334155;
+            max-width: 440px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+            opacity: 0;
+            animation: fadeUp 0.8s 0.15s forwards;
+        }
+        .auth-card::before {
+            content: 'New Vault';
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: var(--midnight);
+            padding: 0 10px;
+        }
+
+        .brand-header { text-align: center; margin-bottom: 30px; }
+        .register-icon {
+            width: 54px; height: 54px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 1.3rem;
         }
         h1 {
-            color: #38bdf8;
-            margin: 0 0 8px 0;
-            text-align: center;
-            font-size: 28px;
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: 2rem;
+            color: var(--candle);
+            letter-spacing: 0.03em;
         }
         p.subtitle {
-            color: #94a3b8;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--petal);
+            margin-top: 8px;
+        }
+
+        /* ── PHOTO UPLOAD ── */
+        .photo-upload-zone { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .photo-preview {
+            width: 104px; height: 104px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed rgba(244,201,122,0.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            color: var(--candle);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.25s;
+        }
+        .photo-preview:hover { border-color: var(--candle); background: rgba(244,201,122,0.05); }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-hint {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(13,11,14,0.7);
+            color: var(--warm);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.52rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             text-align: center;
-            font-size: 14px;
-            margin-bottom: 24px;
+            opacity: 0;
+            transition: opacity 0.25s;
+            padding: 8px;
         }
-        .form-group {
-            margin-bottom: 16px;
+        .photo-preview.has-image:hover .photo-hint { opacity: 1; }
+        .photo-upload-row { display: flex; gap: 10px; }
+        .photo-btn {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: rgba(244,201,122,0.06);
+            border: 1px solid rgba(244,201,122,0.25);
+            padding: 8px 16px;
+            transition: all 0.2s;
         }
+        .photo-btn:hover { background: rgba(244,201,122,0.14); }
+        .photo-btn.remove { color: var(--rose); background: rgba(193,123,138,0.08); border-color: rgba(193,123,138,0.3); display: none; }
+        .photo-btn.remove:hover { background: rgba(193,123,138,0.16); }
+        .photo-note {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.05em;
+            color: var(--mist);
+            text-align: center;
+        }
+        .photo-error { font-size: 0.72rem; color: var(--rose); text-align: center; display: none; }
+
+        /* ── FORM ── */
+        .form-group { margin-bottom: 18px; }
         label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #cbd5e1;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 8px;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background-color: #0f172a;
-            color: #ffffff;
-            font-size: 14px;
+            padding: 12px 16px;
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
             outline: none;
-            transition: border-color 0.2s, outline 0.2s;
+            transition: border-color 0.25s, background-color 0.25s;
         }
-        input:focus {
-            outline: 2px solid #0284c7;
-            border-color: transparent;
+        input::placeholder { color: rgba(140,132,160,0.5); }
+        input:focus { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+
+        .username-wrap { display: flex; align-items: stretch; }
+        .username-prefix {
+            display: flex; align-items: center;
+            padding: 0 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            border-right: none;
+            color: var(--mist);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.95rem;
         }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-            margin-bottom: 20px;
-        }
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #0284c7;
-            cursor: pointer;
-        }
-        .checkbox-group label {
-            margin-bottom: 0;
-            cursor: pointer;
-            font-size: 14px;
-            color: #94a3b8;
-        }
+        .username-wrap input { border-left: none; }
+        .username-wrap:focus-within .username-prefix { border-color: var(--candle); }
+
         .btn-submit {
             width: 100%;
-            padding: 12px;
-            background-color: #0284c7;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 15px;
+            background-color: transparent;
+            color: var(--candle);
+            border: 1px solid rgba(244,201,122,0.4);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            transition: all 0.3s;
             margin-top: 8px;
-            transition: background-color 0.2s;
         }
-        .btn-submit:hover {
-            background-color: #0369a1;
-        }
-        .btn-submit:disabled {
-            background-color: #475569;
-            cursor: not-allowed;
-        }
+        .btn-submit:hover { background-color: var(--candle); color: var(--midnight); }
+        .btn-submit:disabled { background-color: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
+
         .alert {
             padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 16px;
+            font-size: 0.85rem;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 18px;
             display: none;
             text-align: center;
+            border: 1px solid transparent;
         }
-        .alert-error {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-        }
-        .alert-success {
-            background-color: #14532d;
-            color: #86efac;
-        }
+        .alert-error { background: rgba(193,123,138,0.1); color: var(--rose); border-color: rgba(193,123,138,0.35); }
+        .alert-success { background: rgba(244,201,122,0.1); color: var(--candle); border-color: rgba(244,201,122,0.35); }
+
         .link-footer {
-            margin-top: 20px;
+            margin-top: 24px;
             text-align: center;
-            font-size: 14px;
-            color: #94a3b8;
+            font-size: 0.9rem;
+            color: var(--mist);
         }
-        .link-footer a {
-            color: #0284c7;
-            text-decoration: none;
-            font-weight: bold;
+        .link-footer a { color: var(--candle); text-decoration: none; font-style: italic; }
+        .link-footer a:hover { text-decoration: underline; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .link-footer a:hover {
-            text-decoration: underline;
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 44px 26px 34px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, input { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+            .auth-card { animation: none; opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="auth-card">
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
+
+<div class="auth-card">
+    <div class="brand-header">
+        <div class="register-icon"><i class="fa-solid fa-ribbon"></i></div>
         <h1>EchoVault</h1>
         <p class="subtitle">Create an account to secure your legacy.</p>
-
-        <div id="alert-box" class="alert" aria-live="polite"></div>
-
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" required placeholder="John Doe">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="name@example.com" autocomplete="email">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
-            </div>
-
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="requestAdmin" name="requestAdmin">
-                <label for="requestAdmin">Register as Administrator</label>
-            </div>
-
-            <button type="submit" class="btn-submit" id="btn-register">Create Vault Account</button>
-        </form>
-
-        <div class="link-footer">
-            Already have a vault? <a href="/login.html">Sign In</a>
-        </div>
     </div>
 
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    <div id="alert-box" class="alert" aria-live="polite"></div>
 
-            const alertBox = document.getElementById('alert-box');
-            const submitBtn = document.getElementById('btn-register');
+    <form id="registerForm">
 
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const requestAdmin = document.getElementById('requestAdmin').checked;
+        <!-- Profile Picture -->
+        <div class="photo-upload-zone">
+            <div class="photo-preview" id="photoPreview">
+                <i class="fa-solid fa-camera" id="photoPlaceholderIcon"></i>
+                <div class="photo-hint">Change photo</div>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display:none;">
+            <div class="photo-upload-row">
+                <button type="button" class="photo-btn" id="uploadPhotoBtn">Upload Photo</button>
+                <button type="button" class="photo-btn remove" id="removePhotoBtn">Remove</button>
+            </div>
+            <div class="photo-note">JPG or PNG, up to 3MB · optional</div>
+            <div class="photo-error" id="photoError"></div>
+        </div>
 
-            alertBox.style.display = 'none';
-            alertBox.className = 'alert';
-            alertBox.textContent = '';
+        <div class="form-group">
+            <label for="username">Username</label>
+            <div class="username-wrap">
+                <span class="username-prefix">@</span>
+                <input type="text" id="username" name="username" required minlength="3" maxlength="20" pattern="^[a-zA-Z0-9_]+$" placeholder="margaret_w" title="3-20 characters: letters, numbers, underscores">
+            </div>
+        </div>
 
-            // Password confirmation check
-            if (password !== confirmPassword) {
-                alertBox.className = 'alert alert-error';
-                alertBox.textContent = 'Passwords do not match.';
-                alertBox.style.display = 'block';
-                return;
+        <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required placeholder="John">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="name@gmail.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-register">Create Vault Account</button>
+    </form>
+
+    <div class="link-footer">
+        Already have a vault? <a href="/login.html">Sign In</a>
+    </div>
+</div>
+
+<script>
+    /*
+     * PROFILE PICTURE
+     * Client-side preview + base64 encode, sent alongside the
+     * registration payload as "profilePicture". If the backend's
+     * /api/auth/register endpoint expects multipart/form-data instead
+     * of JSON, swap this for a FormData submission.
+     */
+    const photoPreview = document.getElementById('photoPreview');
+    const photoPlaceholderIcon = document.getElementById('photoPlaceholderIcon');
+    const photoInput = document.getElementById('photoInput');
+    const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const photoError = document.getElementById('photoError');
+
+    let profilePictureData = null;
+    const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
+
+    function openPhotoPicker() { photoInput.click(); }
+    photoPreview.addEventListener('click', openPhotoPicker);
+    uploadPhotoBtn.addEventListener('click', openPhotoPicker);
+
+    photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        photoError.style.display = 'none';
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            photoError.textContent = 'Please choose an image file.';
+            photoError.style.display = 'block';
+            photoInput.value = '';
+            return;
+        }
+        if (file.size > MAX_PHOTO_BYTES) {
+            photoError.textContent = 'Image must be smaller than 3MB.';
+            photoError.style.display = 'block';
+            photoInput.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            profilePictureData = ev.target.result;
+            photoPreview.innerHTML = `<img src="${profilePictureData}" alt="Profile preview"><div class="photo-hint">Change photo</div>`;
+            photoPreview.classList.add('has-image');
+            removePhotoBtn.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    removePhotoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profilePictureData = null;
+        photoInput.value = '';
+        photoPreview.classList.remove('has-image');
+        photoPreview.innerHTML = `<i class="fa-solid fa-camera" id="photoPlaceholderIcon"></i><div class="photo-hint">Change photo</div>`;
+        removePhotoBtn.style.display = 'none';
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const alertBox = document.getElementById('alert-box');
+        const submitBtn = document.getElementById('btn-register');
+
+        const username = document.getElementById('username').value.trim();
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        alertBox.style.display = 'none';
+        alertBox.className = 'alert';
+        alertBox.textContent = '';
+
+        if (password !== confirmPassword) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'Passwords do not match.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating Account...';
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    fullName: fullName,
+                    email: email,
+                    password: password,
+                    profilePicture: profilePictureData,
+                    role: 'ROLE_USER'
+                })
+            });
+
+            let data = {};
+            const contentType = response.headers.get('content-type');
+
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const rawText = await response.text();
+                if (rawText) data = { message: rawText };
             }
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating Account...';
-
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fullName: fullName,
-                        name: fullName,
-                        email: email,
-                        password: password,
-                        requestAdmin: requestAdmin,
-                        isAdmin: requestAdmin,
-                        role: requestAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'
-                    })
-                });
-
-                let data = {};
-                const contentType = response.headers.get('content-type');
-                
-                if (contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    const rawText = await response.text();
-                    if (rawText) data = { message: rawText };
-                }
-
-                if (response.ok) {
-                    alertBox.className = 'alert alert-success';
-                    alertBox.textContent = data.message || 'Account created successfully! Redirecting...';
-                    alertBox.style.display = 'block';
-
-                    const token = data.token || data.jwtToken || data.accessToken;
-                    if (token) {
-                        localStorage.setItem('jwtToken', token);
-                        setTimeout(() => {
-                            window.location.href = '/vault.html';
-                        }, 1200);
-                    } else {
-                        setTimeout(() => {
-                            window.location.href = '/login.html';
-                        }, 1200);
-                    }
-                } else {
-                    let errorMsg = 'Registration failed. Please try again.';
-                    if (typeof data.error === 'string') {
-                        errorMsg = data.error;
-                    } else if (data.error && data.error.message) {
-                        errorMsg = data.error.message;
-                    } else if (data.message) {
-                        errorMsg = data.message;
-                    }
-
-                    alertBox.className = 'alert alert-error';
-                    alertBox.textContent = errorMsg;
-                    alertBox.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Registration failure:', error);
-                alertBox.className = 'alert alert-error';
-                alertBox.textContent = 'Connection error. Please ensure the backend server is active.';
+            if (response.ok) {
+                alertBox.className = 'alert alert-success';
+                alertBox.textContent = 'Account created successfully! Redirecting to login...';
                 alertBox.style.display = 'block';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Vault Account';
+
+                localStorage.removeItem('jwtToken');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 1200);
+            } else {
+                let errorMsg = 'Registration failed. Please try again.';
+                if (typeof data.error === 'string') {
+                    errorMsg = data.error;
+                } else if (data.error && data.error.message) {
+                    errorMsg = data.error.message;
+                } else if (data.message) {
+                    errorMsg = data.message;
+                }
+
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = errorMsg;
+                alertBox.style.display = 'block';
             }
+        } catch (error) {
+            console.error('Registration failure:', error);
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'Connection error. Please ensure the backend server is active.';
+            alertBox.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Vault Account';
+        }
+    });
+</script>
+
+<script>
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
         });
-    </script>
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

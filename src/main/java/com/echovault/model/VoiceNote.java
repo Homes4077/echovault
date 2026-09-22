@@ -19,12 +19,10 @@ public class VoiceNote {
 
     private String title;
 
-    @Lob
-    @Column(name = "audio_url", columnDefinition = "LONGTEXT")
+    @Column(name = "audio_url", columnDefinition = "TEXT")
     private String audioUrl;
 
-    @Lob
-    @Column(name = "transcript", columnDefinition = "LONGTEXT")
+    @Column(name = "transcript", columnDefinition = "TEXT")
     private String transcript;
 
     @Enumerated(EnumType.STRING)

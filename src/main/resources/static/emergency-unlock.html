@@ -4,227 +4,484 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Emergency Access & Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b1120; color: #f8fafc; min-height: 100vh; padding: 2rem 1rem; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #1e293b; padding-bottom: 1rem; }
-        .brand { color: #0ea5e9; font-weight: 700; text-decoration: none; font-size: 1.1rem; }
-        .brand:hover { text-decoration: underline; }
-        
-        .nav-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: #131c31; padding: 0.35rem; border-radius: 8px; border: 1px solid #1e293b; }
-        .tab-btn { flex: 1; padding: 0.75rem; background: transparent; border: none; color: #94a3b8; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s; font-size: 0.9rem; }
-        .tab-btn.active { background: #0ea5e9; color: #ffffff; }
-        
-        .card { background: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
-        .card-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .title-unlock { color: #ef4444; }
-        .title-setup { color: #0ea5e9; }
-        .card-subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.5; }
-        
-        .form-group { margin-bottom: 1.25rem; }
-        label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem; font-weight: 500; }
-        input, select { width: 100%; padding: 0.85rem; background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; color: #fff; font-size: 0.95rem; outline: none; }
-        input:focus, select:focus { border-color: #0ea5e9; }
-        
-        .btn-action { width: 100%; padding: 0.85rem; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.2s; font-size: 0.95rem; }
-        .btn-unlock { background: #ef4444; }
-        .btn-unlock:hover { background: #dc2626; }
-        .btn-setup { background: #0ea5e9; }
-        .btn-setup:hover { background: #0284c7; }
-        
-        .status-msg { margin-top: 1.25rem; padding: 0.85rem; border-radius: 6px; font-size: 0.875rem; display: none; text-align: center; font-weight: 500; }
-        .status-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
-        .status-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid #ef4444; }
+        :root {
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            padding: 40px 20px;
+        }
+
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button, input, select { cursor: none; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 3px;
+        }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
+
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        .container { max-width: 560px; margin: 0 auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 34px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(200,184,216,0.1);
+        }
+        .brand {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--petal);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+            transition: color 0.25s;
+        }
+        .brand:hover { color: var(--candle); }
+        .page-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        /* ── TABS ── */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(200,184,216,0.12);
+            margin-bottom: 30px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            color: var(--mist);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+            transition: all 0.25s;
+        }
+        .tab-btn:hover { color: var(--petal); }
+        .tab-btn.active { color: var(--candle); border-bottom-color: var(--candle); }
+
+        /* ── CARD ── */
+        .card {
+            position: relative;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 40px 36px 34px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+        .card::before {
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: var(--midnight);
+            padding: 0 10px;
+        }
+        #unlockPanel::before { content: 'Emergency Access'; color: var(--rose); }
+        #setupPanel::before { content: 'Recovery Setup'; color: var(--candle); }
+
+        .card-title {
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .title-unlock { color: var(--rose); }
+        .title-setup { color: var(--candle); }
+        .card-subtitle {
+            font-style: italic;
+            font-size: 0.92rem;
+            color: var(--petal);
+            margin-bottom: 26px;
+            line-height: 1.6;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 9px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.25s, background-color 0.25s;
+        }
+        input::placeholder { color: rgba(140,132,160,0.5); }
+        input:focus, select:focus { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23F4C97A' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 10px 7px;
+            padding-right: 42px;
+        }
+        select option { background-color: var(--deep); color: var(--warm); }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .btn-unlock { color: var(--rose); border-color: rgba(193,123,138,0.4); }
+        .btn-unlock:hover { background: var(--rose); color: var(--midnight); }
+        .btn-setup { color: var(--candle); border-color: rgba(244,201,122,0.4); }
+        .btn-setup:hover { background: var(--candle); color: var(--midnight); }
+        .btn-action:disabled { background: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
+
+        .status-msg {
+            margin-top: 20px;
+            padding: 13px 16px;
+            font-size: 0.88rem;
+            display: none;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            border: 1px solid transparent;
+        }
+        .status-success { background: rgba(244,201,122,0.1); color: var(--candle); border-color: rgba(244,201,122,0.35); }
+        .status-error { background: rgba(193,123,138,0.1); color: var(--rose); border-color: rgba(193,123,138,0.35); }
+
+        @media (max-width: 560px) {
+            body { padding: 28px 16px; }
+            .card { padding: 32px 22px 26px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, input, select { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="/dashboard.html" class="brand">← Dashboard</a>
-            <span style="color: #64748b; font-size: 0.9rem;">Emergency Protocols</span>
-        </div>
 
-        <div class="nav-tabs">
-            <button class="tab-btn active" id="tabUnlockBtn" onclick="switchTab('unlock')">Family Access Unlock</button>
-            <button class="tab-btn" id="tabSetupBtn" onclick="switchTab('setup')">Configure Security Question</button>
-        </div>
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
 
-        <!-- Panel 1: Emergency Unlock (Public / Family Access) -->
-        <div id="unlockPanel" class="card">
-            <h1 class="card-title title-unlock">Emergency Family Access</h1>
-            <p class="card-subtitle">Provide the account owner email and answer to the security challenge to unlock read-only access to vault contents.</p>
-
-            <form id="unlockForm">
-                <div class="form-group">
-                    <label for="ownerEmail">Account Owner Email</label>
-                    <input type="email" id="ownerEmail" placeholder="owner@echovault.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="securityAnswer">Security Question Answer</label>
-                    <input type="text" id="securityAnswer" placeholder="Enter answer..." required autocomplete="off">
-                </div>
-                <button type="submit" class="btn-action btn-unlock" id="unlockSubmitBtn">Verify Answer & Unlock Vault</button>
-            </form>
-            <div id="unlockStatus" class="status-msg"></div>
-        </div>
-
-        <!-- Panel 2: Owner Protocol Setup (Requires Logged-In Vault Owner) -->
-        <div id="setupPanel" class="card" style="display: none;">
-            <h1 class="card-title title-setup">Set Security Challenge</h1>
-            <p class="card-subtitle">Define the challenge prompt and secret answer family members must provide during emergency recovery.</p>
-
-            <form id="setupForm">
-                <div class="form-group">
-                    <label for="questionSelect">Select or Type Security Question</label>
-                    <select id="questionSelect" onchange="toggleCustomQuestion(this)">
-                        <option value="What was the name of your first pet?">What was the name of your first pet?</option>
-                        <option value="What street did you grow up on?">What street did you grow up on?</option>
-                        <option value="What primary school did you attend?">What primary school did you attend?</option>
-                        <option value="custom">-- Custom Question --</option>
-                    </select>
-                </div>
-                <div class="form-group" id="customGroup" style="display: none;">
-                    <label for="customQuestion">Custom Security Question</label>
-                    <input type="text" id="customQuestion" placeholder="Enter custom security question">
-                </div>
-                <div class="form-group">
-                    <label for="setupAnswer">Secret Answer</label>
-                    <input type="text" id="setupAnswer" placeholder="Enter secret answer" required autocomplete="off">
-                </div>
-                <button type="submit" class="btn-action btn-setup" id="setupSubmitBtn">Save Emergency Protocol</button>
-            </form>
-            <div id="setupStatus" class="status-msg"></div>
-        </div>
+<div class="container">
+    <div class="header">
+        <a href="/dashboard.html" class="brand"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <span class="page-tag">Emergency Protocols</span>
     </div>
 
-    <script src="/js/auth-check.js"></script>
-    <script>
-        function switchTab(tab) {
-            document.getElementById('unlockPanel').style.display = tab === 'unlock' ? 'block' : 'none';
-            document.getElementById('setupPanel').style.display = tab === 'setup' ? 'block' : 'none';
-            document.getElementById('tabUnlockBtn').classList.toggle('active', tab === 'unlock');
-            document.getElementById('tabSetupBtn').classList.toggle('active', tab === 'setup');
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tabUnlockBtn" onclick="switchTab('unlock')">Family Access Unlock</button>
+        <button class="tab-btn" id="tabSetupBtn" onclick="switchTab('setup')">Configure Security Question</button>
+    </div>
+
+    <!-- Panel 1: Emergency Unlock (Public / Family Access) -->
+    <div id="unlockPanel" class="card">
+        <h1 class="card-title title-unlock">Emergency Family Access</h1>
+        <p class="card-subtitle">Provide the account owner email and answer to the security challenge to unlock read-only access to vault contents.</p>
+
+        <form id="unlockForm">
+            <div class="form-group">
+                <label for="ownerEmail">Account Owner Email</label>
+                <input type="email" id="ownerEmail" placeholder="owner@echovault.com" required>
+            </div>
+            <div class="form-group">
+                <label for="securityAnswer">Security Question Answer</label>
+                <input type="text" id="securityAnswer" placeholder="Enter answer..." required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-action btn-unlock" id="unlockSubmitBtn">Verify Answer & Unlock Vault</button>
+        </form>
+        <div id="unlockStatus" class="status-msg"></div>
+    </div>
+
+    <!-- Panel 2: Owner Protocol Setup (Requires Logged-In Vault Owner) -->
+    <div id="setupPanel" class="card" style="display: none;">
+        <h1 class="card-title title-setup">Set Security Challenge</h1>
+        <p class="card-subtitle">Define the challenge prompt and secret answer family members must provide during emergency recovery.</p>
+
+        <form id="setupForm">
+            <div class="form-group">
+                <label for="questionSelect">Select or Type Security Question</label>
+                <select id="questionSelect" onchange="toggleCustomQuestion(this)">
+                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                    <option value="What street did you grow up on?">What street did you grow up on?</option>
+                    <option value="What primary school did you attend?">What primary school did you attend?</option>
+                    <option value="custom">-- Custom Question --</option>
+                </select>
+            </div>
+            <div class="form-group" id="customGroup" style="display: none;">
+                <label for="customQuestion">Custom Security Question</label>
+                <input type="text" id="customQuestion" placeholder="Enter custom security question">
+            </div>
+            <div class="form-group">
+                <label for="setupAnswer">Secret Answer</label>
+                <input type="text" id="setupAnswer" placeholder="Enter secret answer" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-action btn-setup" id="setupSubmitBtn">Save Emergency Protocol</button>
+        </form>
+        <div id="setupStatus" class="status-msg"></div>
+    </div>
+</div>
+
+<script src="/js/auth-check.js"></script>
+<script>
+    function switchTab(tab) {
+        document.getElementById('unlockPanel').style.display = tab === 'unlock' ? 'block' : 'none';
+        document.getElementById('setupPanel').style.display = tab === 'setup' ? 'block' : 'none';
+        document.getElementById('tabUnlockBtn').classList.toggle('active', tab === 'unlock');
+        document.getElementById('tabSetupBtn').classList.toggle('active', tab === 'setup');
+    }
+
+    function toggleCustomQuestion(select) {
+        document.getElementById('customGroup').style.display = select.value === 'custom' ? 'block' : 'none';
+    }
+
+    // Handle Emergency Unlock Submission (For Family Members)
+    document.getElementById('unlockForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('unlockStatus');
+        const submitBtn = document.getElementById('unlockSubmitBtn');
+
+        status.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying...';
+
+        const email = document.getElementById('ownerEmail').value.trim();
+        const answer = document.getElementById('securityAnswer').value.trim();
+
+        try {
+            const response = await fetch('/api/emergency/unlock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, answer })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Save read-only FAMILY token and credentials to localStorage
+                localStorage.setItem('jwtToken', data.token);
+                localStorage.setItem('userRole', data.role || 'ROLE_FAMILY');
+                if (data.ownerName) {
+                    localStorage.setItem('vaultOwner', data.ownerName);
+                }
+
+                status.className = 'status-msg status-success';
+                status.textContent = data.message || 'Access granted! Redirecting to Memorial Archive...';
+                status.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = '/memorial.html';
+                }, 1200);
+            } else {
+                throw new Error(data.error || data.message || 'Incorrect answer or invalid email account.');
+            }
+        } catch (err) {
+            status.className = 'status-msg status-error';
+            status.textContent = err.message || 'Unlock failed. Please check credentials.';
+            status.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Verify Answer & Unlock Vault';
+        }
+    });
+
+    // Handle Security Question Setup Submission (For Vault Owner)
+    document.getElementById('setupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('setupStatus');
+        const submitBtn = document.getElementById('setupSubmitBtn');
+        const token = localStorage.getItem('jwtToken');
+
+        status.style.display = 'none';
+
+        if (!token) {
+            status.className = 'status-msg status-error';
+            status.textContent = 'Session missing or expired. Please log in as vault owner again.';
+            status.style.display = 'block';
+            return;
         }
 
-        function toggleCustomQuestion(select) {
-            document.getElementById('customGroup').style.display = select.value === 'custom' ? 'block' : 'none';
+        const selectVal = document.getElementById('questionSelect').value;
+        const question = selectVal === 'custom' ? document.getElementById('customQuestion').value.trim() : selectVal;
+        const answer = document.getElementById('setupAnswer').value.trim();
+
+        if (!question || !answer) {
+            status.className = 'status-msg status-error';
+            status.textContent = 'Please fill out both the security question and answer.';
+            status.style.display = 'block';
+            return;
         }
 
-        // Handle Emergency Unlock Submission (For Family Members)
-        document.getElementById('unlockForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const status = document.getElementById('unlockStatus');
-            const submitBtn = document.getElementById('unlockSubmitBtn');
-            
-            status.style.display = 'none';
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Verifying...';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving Protocol...';
 
-            const email = document.getElementById('ownerEmail').value.trim();
-            const answer = document.getElementById('securityAnswer').value.trim();
+        try {
+            const response = await fetch('/api/emergency/recovery-question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ question, answer })
+            });
 
+            // Read text response safely to prevent JSON parsing issues on empty/text responses
+            const text = await response.text();
+            let data = {};
             try {
-                const response = await fetch('/api/emergency/unlock', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, answer })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Save read-only FAMILY token and credentials to localStorage
-                    localStorage.setItem('jwtToken', data.token);
-                    localStorage.setItem('userRole', data.role || 'ROLE_FAMILY');
-                    if (data.ownerName) {
-                        localStorage.setItem('vaultOwner', data.ownerName);
-                    }
-
-                    status.className = 'status-msg status-success';
-                    status.textContent = data.message || 'Access granted! Redirecting to Memorial Archive...';
-                    status.style.display = 'block';
-
-                    setTimeout(() => {
-                        window.location.href = '/memorial.html';
-                    }, 1200);
-                } else {
-                    throw new Error(data.error || data.message || 'Incorrect answer or invalid email account.');
-                }
-            } catch (err) {
-                status.className = 'status-msg status-error';
-                status.textContent = err.message || 'Unlock failed. Please check credentials.';
-                status.style.display = 'block';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Verify Answer & Unlock Vault';
+                data = text ? JSON.parse(text) : {};
+            } catch (parseErr) {
+                data = { message: text };
             }
+
+            if (response.ok) {
+                status.className = 'status-msg status-success';
+                status.textContent = data.message || 'Emergency security protocol configured successfully!';
+            } else {
+                throw new Error(data.error || data.message || 'Failed to save configuration.');
+            }
+        } catch (err) {
+            status.className = 'status-msg status-error';
+            status.textContent = err.message || 'Failed to update security configuration.';
+        } finally {
+            status.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save Emergency Protocol';
+        }
+    });
+</script>
+
+<script>
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
         });
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
 
-        // Handle Security Question Setup Submission (For Vault Owner)
-        document.getElementById('setupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const status = document.getElementById('setupStatus');
-            const submitBtn = document.getElementById('setupSubmitBtn');
-            const token = localStorage.getItem('jwtToken');
-
-            status.style.display = 'none';
-
-            if (!token) {
-                status.className = 'status-msg status-error';
-                status.textContent = 'Session missing or expired. Please log in as vault owner again.';
-                status.style.display = 'block';
-                return;
-            }
-
-            const selectVal = document.getElementById('questionSelect').value;
-            const question = selectVal === 'custom' ? document.getElementById('customQuestion').value.trim() : selectVal;
-            const answer = document.getElementById('setupAnswer').value.trim();
-
-            if (!question || !answer) {
-                status.className = 'status-msg status-error';
-                status.textContent = 'Please fill out both the security question and answer.';
-                status.style.display = 'block';
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Saving Protocol...';
-
-            try {
-                const response = await fetch('/api/emergency/recovery-question', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ question, answer })
-                });
-
-                // Read text response safely to prevent JSON parsing issues on empty/text responses
-                const text = await response.text();
-                let data = {};
-                try {
-                    data = text ? JSON.parse(text) : {};
-                } catch (parseErr) {
-                    data = { message: text };
-                }
-
-                if (response.ok) {
-                    status.className = 'status-msg status-success';
-                    status.textContent = data.message || 'Emergency security protocol configured successfully!';
-                } else {
-                    throw new Error(data.error || data.message || 'Failed to save configuration.');
-                }
-            } catch (err) {
-                status.className = 'status-msg status-error';
-                status.textContent = err.message || 'Failed to update security configuration.';
-            } finally {
-                status.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Save Emergency Protocol';
-            }
-        });
-    </script>
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

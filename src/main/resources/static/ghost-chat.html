@@ -4,67 +4,312 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Ghost AI Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b1120; color: #f8fafc; min-height: 100vh; padding: 2rem 1rem; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #1e293b; padding-bottom: 1rem; }
-        .brand { color: #0ea5e9; font-weight: 700; text-decoration: none; font-size: 1.1rem; }
-        .brand:hover { text-decoration: underline; }
+        :root {
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
+        }
 
-        .chat-card { background: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
-        .chat-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.35rem; color: #0ea5e9; }
-        .chat-header p { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.25rem; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
 
-        .chat-box { background: #0b1120; border: 1px solid #1e293b; border-radius: 8px; height: 400px; padding: 1.25rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
-        .msg { max-width: 82%; padding: 0.85rem 1.1rem; border-radius: 8px; font-size: 0.925rem; line-height: 1.5; }
-        .msg-ghost { background: #1e293b; align-self: flex-start; color: #f8fafc; border-bottom-left-radius: 2px; }
-        .msg-user { background: #0284c7; align-self: flex-end; color: #ffffff; border-bottom-right-radius: 2px; }
-        .msg-error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; align-self: center; width: 100%; text-align: center; }
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            padding: 40px 20px;
+        }
 
-        .input-row { display: flex; gap: 0.75rem; }
-        input { flex: 1; background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 0.85rem 1rem; color: #fff; outline: none; font-size: 0.95rem; }
-        input:focus { border-color: #0ea5e9; }
-        button { background: #0ea5e9; color: #fff; border: none; padding: 0.85rem 1.5rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #0284c7; }
-        button:disabled { background: #334155; cursor: not-allowed; }
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button, input { cursor: none; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 3px;
+        }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
+
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        .container { max-width: 760px; margin: 0 auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(200,184,216,0.1);
+        }
+        .brand {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--petal);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+            transition: color 0.25s;
+        }
+        .brand:hover { color: var(--candle); }
+        .engine-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        /* ── CHAT CARD ── */
+        .chat-card {
+            position: relative;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 40px 36px 32px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            opacity: 0;
+            animation: fadeUp 0.7s 0.1s forwards;
+        }
+        .chat-card::before {
+            content: 'Ghost Engine';
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: var(--midnight);
+            padding: 0 10px;
+        }
+
+        .chat-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 26px; }
+        .chat-icon {
+            width: 48px; height: 48px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 1.2rem;
+        }
+        .chat-header h1 {
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+        .chat-header p {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.92rem;
+            color: var(--petal);
+            line-height: 1.6;
+        }
+
+        .chat-box {
+            background: var(--deep);
+            border: 1px solid rgba(200,184,216,0.1);
+            height: 400px;
+            padding: 22px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .msg {
+            max-width: 82%;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .msg-ghost {
+            background: rgba(200,184,216,0.05);
+            border-left: 2px solid var(--petal);
+            align-self: flex-start;
+            color: var(--petal);
+            font-style: italic;
+        }
+        .msg-user {
+            background: rgba(244,201,122,0.1);
+            border: 1px solid rgba(244,201,122,0.25);
+            align-self: flex-end;
+            color: var(--warm);
+        }
+        .msg-error {
+            background: rgba(193,123,138,0.1);
+            border: 1px solid rgba(193,123,138,0.35);
+            color: var(--rose);
+            align-self: center;
+            width: 100%;
+            text-align: center;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        .input-row { display: flex; gap: 12px; }
+        input {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            padding: 13px 16px;
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.25s, background-color 0.25s;
+        }
+        input::placeholder { color: rgba(140,132,160,0.5); }
+        input:focus { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+
+        button {
+            background: transparent;
+            color: var(--candle);
+            border: 1px solid rgba(244,201,122,0.4);
+            padding: 13px 26px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            transition: all 0.25s;
+        }
+        button:hover { background: var(--candle); color: var(--midnight); }
+        button:disabled { background: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 560px) {
+            body { padding: 28px 16px; }
+            .chat-card { padding: 32px 22px 26px; }
+            .chat-box { height: 340px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, input { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+            .chat-card { animation: none; opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="/dashboard.html" class="brand">← Dashboard</a>
-            <span style="color: #64748b; font-size: 0.9rem;">Ghost Engine</span>
-        </div>
 
-        <div class="chat-card">
-            <div class="chat-header">
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
+
+<div class="container">
+    <div class="header">
+        <a href="/dashboard.html" class="brand"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <span class="engine-tag">Ghost Engine</span>
+    </div>
+
+    <div class="chat-card">
+        <div class="chat-header">
+            <div class="chat-icon"><i class="fa-solid fa-ghost"></i></div>
+            <div>
                 <h1>Ghost AI Companion</h1>
                 <p>Hello. I am your vault companion. Ask me anything about your saved memories or letters.</p>
             </div>
-
-            <div class="chat-box" id="chatBox">
-                <div class="msg msg-ghost">
-                    Ghost: Hello. I am your vault companion. Ask me anything about your saved memories or letters.
-                </div>
-            </div>
-
-            <form id="chatForm" class="input-row">
-                <input type="text" id="userInput" placeholder="Type your prompt..." required autocomplete="off">
-                <button type="submit" id="sendBtn">Send</button>
-            </form>
         </div>
-    </div>
 
-    <script src="/js/auth-check.js"></script>
-    <script>
+        <div class="chat-box" id="chatBox">
+            <div class="msg msg-ghost">
+                Ghost: Hello. I am your vault companion. Ask me anything about your saved memories or letters.
+            </div>
+        </div>
+
+        <form id="chatForm" class="input-row">
+            <input type="text" id="userInput" placeholder="Type your prompt..." required autocomplete="off">
+            <button type="submit" id="sendBtn">Send</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/auth-check.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('jwtToken');
-        if (!token) window.location.href = '/login.html';
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
 
         const chatBox = document.getElementById('chatBox');
         const chatForm = document.getElementById('chatForm');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+
+        if (!chatForm) return;
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -86,25 +331,55 @@
                 });
 
                 if (!res.ok) {
-                    throw new Error(`Error (${res.status}): Failed response`);
+                    const errText = await res.text();
+                    throw new Error(`Error (${res.status}): ${errText || 'Failed response'}`);
                 }
 
                 const data = await res.json();
-                appendMsg(data.response || data.message || 'No response.', 'ghost');
+                appendMsg(data.response || data.message || 'No response received.', 'ghost');
             } catch (err) {
-                appendMsg(err.message, 'error');
+                console.error('Ghost Chat Error:', err);
+                appendMsg(err.message || 'Failed to communicate with the server.', 'error');
             } finally {
                 sendBtn.disabled = false;
             }
         });
 
         function appendMsg(text, sender) {
+            if (!chatBox) return;
             const div = document.createElement('div');
             div.className = `msg msg-${sender}`;
             div.textContent = sender === 'user' ? `You: ${text}` : (sender === 'ghost' ? `Ghost: ${text}` : text);
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-    </script>
+    });
+</script>
+
+<script>
+    /* DECORATIVE LAYER — cursor, trail, ambient particles */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+        });
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

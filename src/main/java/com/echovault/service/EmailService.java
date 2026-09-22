@@ -9,7 +9,6 @@ import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -22,11 +21,13 @@ public class EmailService {
     @Value("${sendgrid.from-email:${SENDGRID_FROM_EMAIL:jmgitahi590@gmail.com}}")
     private String fromEmail;
 
-    @Async
-    public void sendScheduledLetter(String toEmail, String subject, String content, String recipientName) {
+    /**
+     * Synchronous send method that returns delivery status to prevent premature DB updates.
+     */
+    public boolean sendScheduledLetter(String toEmail, String subject, String content, String recipientName) {
         if (sendGridApiKey == null || sendGridApiKey.isBlank() || sendGridApiKey.contains("dummy")) {
-            log.warn("SendGrid dispatch skipped: SENDGRID_API_KEY is unconfigured or set to dummy placeholder.");
-            return;
+            log.error("SendGrid dispatch aborted: SENDGRID_API_KEY is missing or configured with a dummy value.");
+            return false;
         }
 
         try {
@@ -40,7 +41,7 @@ public class EmailService {
             Content mailContent = new Content("text/plain", body);
             Mail mail = new Mail(from, "EchoVault Memory Released: " + subject, to, mailContent);
 
-            SendGrid sg = new SendGrid(sendGridApiKey);
+            SendGrid sg = new SendGrid(sendGridApiKey.trim());
             Request request = new Request();
 
             request.setMethod(Method.POST);
@@ -51,11 +52,14 @@ public class EmailService {
             
             if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
                 log.info("SendGrid email dispatched successfully (Status {}) to recipient: {}", response.getStatusCode(), toEmail);
+                return true;
             } else {
-                log.error("SendGrid dispatch failed! Status: {}, Response Body: {}", response.getStatusCode(), response.getBody());
+                log.error("SendGrid dispatch failed with HTTP {}! Response Body: {}", response.getStatusCode(), response.getBody());
+                return false;
             }
         } catch (Exception ex) {
             log.error("Failed to execute SendGrid API call for {}: {}", toEmail, ex.getMessage(), ex);
+            return false;
         }
     }
 }

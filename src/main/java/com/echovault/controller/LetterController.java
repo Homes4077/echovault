@@ -19,7 +19,11 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+        origins = "*",
+        allowedHeaders = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}
+)
 @RequiredArgsConstructor
 public class LetterController {
 
@@ -94,20 +98,22 @@ public class LetterController {
         try {
             return LocalDateTime.parse(isoFormatted);
         } catch (DateTimeParseException ignored) {
-            // Fall back to alternative patterns
+            // Try fallback formatters below
         }
 
         DateTimeFormatter[] fallbackFormatters = new DateTimeFormatter[] {
-            DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
+                DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm"),
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
         };
 
         for (DateTimeFormatter formatter : fallbackFormatters) {
             try {
                 return LocalDateTime.parse(raw, formatter);
             } catch (DateTimeParseException ignored) {
-                // Keep trying
+                // Keep trying remaining patterns
             }
         }
 

@@ -4,280 +4,604 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Memorial Wall</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="/js/auth-check.js"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30">
-
-    <!-- NAVIGATION -->
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/vault.html" class="text-xl font-bold tracking-wider text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-ribbon text-amber-500"></i>
-                EchoVault
-            </a>
-            <div class="flex gap-6 text-sm font-medium" id="navLinks">
-                <a href="/vault.html" class="text-slate-400 hover:text-slate-200 transition">Vault</a>
-                <a href="/write-letter.html" id="writeLetterNav" class="text-slate-400 hover:text-slate-200 transition">Write Letter</a>
-                <a href="/record-voice.html" class="text-slate-400 hover:text-slate-200 transition">Record Voice</a>
-                <a href="/ghost-chat.html" class="text-amber-400/90 hover:text-amber-300 transition flex items-center gap-1">
-                    <i class="fa-solid fa-ghost"></i> Ghost AI
-                </a>
-                <a href="/memorial.html" class="text-amber-400 border-b-2 border-amber-500 pb-1">Memorial Wall</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO HEADER -->
-    <header class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800 py-14 text-center px-4">
-        <div class="max-w-3xl mx-auto">
-            <div class="text-amber-400 text-3xl mb-4">
-                <i class="fa-solid fa-fire-flame-curved"></i>
-            </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-amber-100 tracking-tight">
-                The Memorial Wall
-            </h1>
-            <p class="text-sm md:text-base text-slate-400 mt-3">
-                Public messages, cherished voice memories, transcribed stories, and legacies preserved for eternity.
-            </p>
-        </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full space-y-14">
-
-        <!-- MEMORIAL LETTERS SECTION -->
-        <section>
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
-                    <i class="fa-solid fa-feather-pointed text-amber-400"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-amber-100">Memorial Tributes</h2>
-                    <p class="text-xs text-slate-500">Written messages and stories shared in remembrance</p>
-                </div>
-            </div>
-
-            <div id="memorialGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mb-3 text-xl"></i>
-                    <p>Loading memorial tributes...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- VOICE MEMORIES & TRANSCRIPTS SECTION -->
-        <section>
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center">
-                    <i class="fa-solid fa-microphone-lines text-amber-400"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-amber-100">Voice Memories & Transcripts</h2>
-                    <p class="text-xs text-slate-500">Audio recordings preserved with real-time text transcriptions</p>
-                </div>
-            </div>
-
-            <div id="voiceNotesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mb-3 text-xl"></i>
-                    <p>Loading voice memories...</p>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-800 bg-slate-900/50 py-6 text-center">
-        <p class="text-xs text-slate-600">
-            EchoVault — Preserving memories, audio recordings, and legacies.
-        </p>
-    </footer>
-
-    <!-- JAVASCRIPT -->
-    <script>
-        document.addEventListener("DOMContentLoaded", loadMemorial);
-
-        async function loadMemorial() {
-            await Promise.all([
-                fetchMemorialLetters(),
-                fetchVoiceNotes()
-            ]);
+    <style>
+        :root {
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
         }
 
-        /* LOAD MEMORIAL LETTERS */
-        async function fetchMemorialLetters() {
-            const container = document.getElementById("memorialGrid");
-            const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-            const headers = {};
-            if (token) headers["Authorization"] = "Bearer " + token;
+        html { scroll-behavior: smooth; }
 
-            try {
-                const response = await fetch("/api/letters/memorial", { headers });
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            display: flex;
+            flex-direction: column;
+        }
 
-                if (!response.ok) throw new Error("Failed to fetch memorial letters");
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button { cursor: none; }
+        a:focus-visible, button:focus-visible { outline: 1px solid var(--candle); outline-offset: 3px; }
 
-                const letters = await response.json();
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
 
-                if (!letters || letters.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                            <i class="fa-solid fa-feather-pointed text-2xl text-amber-400/50 mb-3"></i>
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .brand-link {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.3rem;
+            color: var(--candle);
+            text-decoration: none;
+            letter-spacing: 0.03em;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .nav-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+        .nav-links a {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+            text-decoration: none;
+            transition: color 0.25s;
+            padding-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--candle); }
+        .nav-links a.active { border-bottom: 1px solid var(--candle); }
+        .nav-links a.nav-ghost { color: rgba(244,201,122,0.75); }
+        .nav-back {
+            padding-right: 20px;
+            margin-right: 4px;
+            border-right: 1px solid rgba(200,184,216,0.14);
+            color: var(--petal) !important;
+            border-bottom: none !important;
+        }
+        .nav-back:hover { color: var(--candle) !important; }
+
+        /* ── HERO ── */
+        .wall-hero {
+            position: relative;
+            text-align: center;
+            padding: 80px 24px 60px;
+            background: var(--deep);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+            overflow: hidden;
+        }
+        .wall-hero::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 520px; height: 520px;
+            background: radial-gradient(ellipse, rgba(244,201,122,0.08) 0%, rgba(244,201,122,0.02) 40%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-icon { position: relative; font-size: 1.8rem; color: var(--candle); margin-bottom: 18px; }
+        .hero-title {
+            position: relative;
+            font-family: 'IM Fell English', serif;
+            font-weight: 400;
+            font-size: clamp(2rem, 4.5vw, 2.7rem);
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+        .hero-quote {
+            position: relative;
+            font-style: italic;
+            color: var(--petal);
+            font-size: 1.02rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── LAYOUT ── */
+        .wall-main { max-width: 1200px; margin: 0 auto; padding: 64px 40px 80px; flex: 1; width: 100%; }
+        .wall-section { margin-bottom: 70px; }
+        .wall-section:last-child { margin-bottom: 0; }
+
+        .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 30px; }
+        .section-icon {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.25);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--candle);
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+        .section-title { font-family: 'IM Fell English', serif; font-weight: 400; font-size: 1.35rem; color: var(--white); margin-bottom: 4px; }
+        .section-desc { font-size: 0.85rem; color: var(--mist); font-style: italic; }
+
+        .tribute-grid, .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .tribute-card, .voice-card {
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.1);
+            padding: 28px 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tribute-card:hover, .voice-card:hover {
+            border-color: rgba(244,201,122,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .tribute-meta {
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 16px;
+        }
+        .tribute-title, .voice-card .tribute-title {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.2rem;
+            color: var(--white);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .tribute-body {
+            font-size: 0.95rem;
+            color: var(--petal);
+            line-height: 1.7;
+            white-space: pre-line;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .tribute-footer {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            padding-top: 16px; margin-top: 18px;
+            border-top: 1px solid rgba(200,184,216,0.08);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+        .tribute-recipient {
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.9rem;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .voice-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+        .voice-date { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--mist); white-space: nowrap; }
+        .tag-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.2);
+            padding: 4px 10px;
+        }
+        audio {
+            width: 100%;
+            margin: 14px 0;
+            filter: sepia(0.25) hue-rotate(340deg) saturate(1.6) brightness(0.95);
+        }
+        .transcript-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.08);
+            border-left: 2px solid var(--candle);
+            padding: 14px 16px;
+        }
+        .transcript-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .transcript-text { font-style: italic; font-size: 0.88rem; color: var(--petal); line-height: 1.65; }
+
+        .empty-state, .error-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 24px;
+            background: rgba(255,255,255,0.015);
+            border: 1px dashed rgba(200,184,216,0.15);
+            color: var(--mist);
+        }
+        .empty-state i { color: rgba(244,201,122,0.5); font-size: 1.4rem; margin-bottom: 12px; display: block; }
+        .empty-state p:first-of-type { font-style: italic; font-size: 1rem; }
+        .empty-state p:last-child { font-size: 0.8rem; color: var(--ash); margin-top: 8px; font-style: normal; }
+        .error-state { color: var(--rose); border-color: rgba(193,123,138,0.25); }
+        .error-state i { color: var(--rose); font-size: 1.3rem; margin-bottom: 10px; display: block; }
+
+        .site-footer { padding: 26px 24px; text-align: center; background: #080608; border-top: 1px solid rgba(200,184,216,0.06); }
+        .site-footer p { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; color: var(--ash); }
+
+        @media (max-width: 640px) {
+            .topnav { padding: 16px 20px; }
+            .wall-main { padding: 48px 20px 60px; }
+            .wall-hero { padding: 60px 20px 44px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
+
+<!-- NAVIGATION -->
+<nav class="topnav">
+    <a href="/dashboard.html" class="brand-link">
+        <i class="fa-solid fa-ribbon"></i> EchoVault
+    </a>
+    <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <a href="/vault.html">Vault</a>
+        <a href="/write-letter.html" id="writeLetterNav">Write Letter</a>
+        <a href="/record-voice.html">Record Voice</a>
+        <a href="/ghost-chat.html" class="nav-ghost"><i class="fa-solid fa-ghost"></i> Ghost AI</a>
+        <a href="/memorial.html" class="active">Memorial Wall</a>
+    </div>
+</nav>
+
+<!-- HERO HEADER -->
+<header class="wall-hero">
+    <div class="hero-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+    <h1 class="hero-title">The Memorial Wall</h1>
+    <p class="hero-quote">Public messages, cherished voice memories, transcribed stories, and legacies preserved for eternity.</p>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="wall-main">
+
+    <!-- MEMORIAL LETTERS SECTION -->
+    <section class="wall-section">
+        <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div>
+                <h2 class="section-title">Memorial Tributes</h2>
+                <p class="section-desc">Written messages and stories shared in remembrance</p>
+            </div>
+        </div>
+
+        <div id="memorialGrid" class="tribute-grid">
+            <div class="empty-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading memorial tributes...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- VOICE MEMORIES & TRANSCRIPTS SECTION -->
+    <section class="wall-section">
+        <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+            <div>
+                <h2 class="section-title">Voice Memories & Transcripts</h2>
+                <p class="section-desc">Audio recordings preserved with real-time text transcriptions</p>
+            </div>
+        </div>
+
+        <div id="voiceNotesGrid" class="voice-grid">
+            <div class="empty-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading voice memories...</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <p>EchoVault — Preserving memories, audio recordings, and legacies.</p>
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", loadMemorial);
+
+    async function loadMemorial() {
+        await Promise.all([
+            fetchMemorialLetters(),
+            fetchVoiceNotes()
+        ]);
+    }
+
+    /* LOAD MEMORIAL LETTERS */
+    async function fetchMemorialLetters() {
+        const container = document.getElementById("memorialGrid");
+        const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
+
+        const headers = {};
+        if (token) headers["Authorization"] = "Bearer " + token;
+
+        try {
+            const response = await fetch("/api/letters/memorial", { headers });
+
+            if (!response.ok) throw new Error("Failed to fetch memorial letters");
+
+            const letters = await response.json();
+
+            if (!letters || letters.length === 0) {
+                container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-solid fa-feather-pointed"></i>
                             <p>No public tributes on the Memorial Wall yet.</p>
-                            <p class="text-xs text-slate-600 mt-2">
-                                Create a note in your Vault and publish it to the Public Memorial Wall.
-                            </p>
+                            <p>Create a note in your Vault and publish it to the Public Memorial Wall.</p>
                         </div>
                     `;
-                    return;
-                }
+                return;
+            }
 
-                container.innerHTML = letters.map(letter => {
-                    const dateStr = letter.deliveredAt || letter.createdAt
-                        ? new Date(letter.deliveredAt || letter.createdAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric"
-                          })
-                        : "Preserved Memory";
+            container.innerHTML = letters.map(letter => {
+                const dateStr = letter.deliveredAt || letter.createdAt
+                    ? new Date(letter.deliveredAt || letter.createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    })
+                    : "Preserved Memory";
 
-                    return `
-                        <article class="bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/50 rounded-xl p-6 shadow-lg transition duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                return `
+                        <article class="tribute-card">
                             <div>
-                                <div class="flex items-center gap-2 text-amber-400 text-xs mb-4">
+                                <div class="tribute-meta">
                                     <i class="fa-solid fa-quote-left"></i>
                                     <span>${escapeHtml(dateStr)}</span>
                                 </div>
 
-                                <h3 class="text-lg font-bold text-amber-100 leading-snug mb-3">
+                                <h3 class="tribute-title">
                                     ${escapeHtml(letter.title || letter.subject || "In Remembrance")}
                                 </h3>
 
-                                <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto pr-1">
+                                <div class="tribute-body">
                                     ${escapeHtml(letter.bodyContent || letter.content || "")}
                                 </div>
                             </div>
 
                             ${letter.recipientName ? `
-                                <div class="pt-4 mt-5 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between gap-4">
+                                <div class="tribute-footer">
                                     <span>Dedicated to:</span>
-                                    <span class="font-semibold text-slate-200 text-right">
+                                    <span class="tribute-recipient">
                                         ${escapeHtml(letter.recipientName)}
                                     </span>
                                 </div>
                             ` : ""}
                         </article>
                     `;
-                }).join("");
+            }).join("");
 
-            } catch (error) {
-                console.error("Error loading memorial letters:", error);
-                container.innerHTML = `
-                    <div class="col-span-full p-8 text-center text-rose-400 border border-rose-900/50 bg-rose-950/20 rounded-xl">
-                        <i class="fa-solid fa-triangle-exclamation mb-2"></i>
+        } catch (error) {
+            console.error("Error loading memorial letters:", error);
+            container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                         <p>Failed to load memorial tributes.</p>
                     </div>
                 `;
-            }
         }
+    }
 
-        /* LOAD VOICE MEMORIES */
-        async function fetchVoiceNotes() {
-            const container = document.getElementById("voiceNotesGrid");
-            const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
+    /* LOAD VOICE MEMORIES */
+    async function fetchVoiceNotes() {
+        const container = document.getElementById("voiceNotesGrid");
+        const token = localStorage.getItem("jwtToken") || localStorage.getItem("token");
 
-            const headers = {};
-            if (token) headers["Authorization"] = "Bearer " + token;
+        const headers = {};
+        if (token) headers["Authorization"] = "Bearer " + token;
 
-            try {
-                const response = await fetch("/api/voice-notes", { headers });
+        try {
+            const response = await fetch("/api/voice-notes", { headers });
 
-                if (!response.ok) throw new Error("Failed to fetch voice notes");
+            if (!response.ok) throw new Error("Failed to fetch voice notes");
 
-                const voiceNotes = await response.json();
+            const voiceNotes = await response.json();
 
-                if (!voiceNotes || voiceNotes.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full p-12 text-center text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                            <i class="fa-solid fa-microphone text-2xl text-amber-400/50 mb-3"></i>
+            if (!voiceNotes || voiceNotes.length === 0) {
+                container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-solid fa-microphone"></i>
                             <p>No voice memories recorded on the Memorial Wall yet.</p>
-                            <p class="text-xs text-slate-600 mt-2">
-                                Record audio notes to preserve spoken memories and automated transcripts.
-                            </p>
+                            <p>Record audio notes to preserve spoken memories and automated transcripts.</p>
                         </div>
                     `;
-                    return;
-                }
+                return;
+            }
 
-                container.innerHTML = voiceNotes.map(note => {
-                    const dateStr = note.createdAt
-                        ? new Date(note.createdAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric"
-                          })
-                        : "Preserved Memory";
+            container.innerHTML = voiceNotes.map(note => {
+                const dateStr = note.createdAt
+                    ? new Date(note.createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    })
+                    : "Preserved Memory";
 
-                    return `
-                        <article class="bg-slate-900/90 border border-amber-500/20 hover:border-amber-500/50 rounded-xl p-6 shadow-lg transition duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                return `
+                        <article class="voice-card">
                             <div>
-                                <div class="flex items-center justify-between text-xs mb-3">
-                                    <span class="px-2.5 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-medium border border-amber-500/20">
-                                        <i class="fa-solid fa-microphone mr-1"></i> ${escapeHtml(note.tag || "MOTIVATIONAL")}
+                                <div class="voice-meta-row">
+                                    <span class="tag-pill">
+                                        <i class="fa-solid fa-microphone"></i> ${escapeHtml(note.tag || "MOTIVATIONAL")}
                                     </span>
-                                    <span class="text-slate-500">${escapeHtml(dateStr)}</span>
+                                    <span class="voice-date">${escapeHtml(dateStr)}</span>
                                 </div>
 
-                                <h3 class="text-lg font-bold text-amber-100 leading-snug mb-3">
+                                <h3 class="tribute-title">
                                     ${escapeHtml(note.title || "Untitled Voice Memory")}
                                 </h3>
 
                                 <!-- Audio Player -->
-                                <div class="my-3 bg-slate-950 p-2 rounded-lg border border-slate-800">
-                                    <audio controls src="${escapeAttribute(note.audioUrl || '')}" class="w-full h-8"></audio>
-                                </div>
+                                <audio controls src="${escapeAttribute(note.audioUrl || '')}"></audio>
 
                                 <!-- Transcript Section -->
-                                <div class="mt-3 bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 text-xs text-slate-300">
-                                    <div class="text-[10px] text-amber-400/80 font-mono mb-1 uppercase tracking-wider flex items-center gap-1">
+                                <div class="transcript-box">
+                                    <div class="transcript-label">
                                         <i class="fa-solid fa-file-lines"></i> Transcript
                                     </div>
-                                    <p class="italic leading-relaxed">
+                                    <p class="transcript-text">
                                         "${escapeHtml(note.transcript || "No transcript generated for this voice memory.")}"
                                     </p>
                                 </div>
                             </div>
                         </article>
                     `;
-                }).join("");
+            }).join("");
 
-            } catch (error) {
-                console.error("Error loading voice notes:", error);
-                container.innerHTML = `
-                    <div class="col-span-full p-8 text-center text-rose-400 border border-rose-900/50 bg-rose-950/20 rounded-xl">
-                        <i class="fa-solid fa-triangle-exclamation mb-2"></i>
+        } catch (error) {
+            console.error("Error loading voice notes:", error);
+            container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                         <p>Failed to load voice memories.</p>
                     </div>
                 `;
-            }
         }
+    }
 
-        /* SECURITY ESCAPING */
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+    /* SECURITY ESCAPING */
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-        function escapeAttribute(value) {
-            return escapeHtml(value);
+    function escapeAttribute(value) {
+        return escapeHtml(value);
+    }
+</script>
+
+<script>
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+        });
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
         }
-    </script>
+    }
+</script>
 </body>
 </html>

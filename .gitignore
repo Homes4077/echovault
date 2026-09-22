@@ -12,3 +12,4 @@ target/
 run.sh
 data/*.db
 uploads/
+run.bat

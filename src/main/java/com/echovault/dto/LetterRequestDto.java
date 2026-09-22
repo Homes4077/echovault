@@ -1,4 +1,4 @@
-package com.echovault.dto; // Fixed lowercase 'package' keyword
+package com.echovault.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,5 +26,14 @@ public class LetterRequestDto {
     private LocalDateTime scheduledDeliveryAt;
 
     @JsonProperty("isPublic") // Ensures Jackson maps "isPublic" from JSON body
-    private boolean isPublic;
+    private Boolean isPublic; // Wrapper object prevents primitive default assignment
+
+    // Explicit getters and setters to avoid Lombok/Jackson boolean mapping naming conflicts
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 }

@@ -12,7 +12,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"password", "profilePicture", "securityAnswer"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -20,7 +23,11 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+
+    @Column(unique = true)
+    private String username;
 
     private String fullName;
 
@@ -30,13 +37,36 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    private String role;
+    @Column(columnDefinition = "TEXT")
+    private String profilePicture;
+
+    @Builder.Default
+    private String role = "ROLE_USER";
 
     private LocalDateTime lastLoginAt;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     // Emergency protocol fields
     private String securityQuestion;
     private String securityAnswer;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.role == null) {
+            this.role = "ROLE_USER";
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     // Helper method to maintain backwards compatibility with getName() calls
     public String getName() {
@@ -56,14 +86,28 @@ public class User implements UserDetails {
         return this.securityAnswer;
     }
 
+    // Custom getter to access the display username explicitly
+    public String getDisplayUsername() {
+        return this.username;
+    }
+
+    // Custom setter for display username
+    public void setDisplayUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role != null ? role : "ROLE_USER"));
+        String assignedRole = (role != null && !role.isBlank()) ? role : "ROLE_USER";
+        if (!assignedRole.startsWith("ROLE_")) {
+            assignedRole = "ROLE_" + assignedRole;
+        }
+        return List.of(new SimpleGrantedAuthority(assignedRole));
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return email; // Retained for Spring Security JWT principal resolution
     }
 
     @Override

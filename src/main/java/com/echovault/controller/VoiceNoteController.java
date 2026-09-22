@@ -42,57 +42,74 @@ public class VoiceNoteController {
         String identifier = auth.getName();
         return userRepository.findByEmail(identifier)
                 .orElseGet(() -> userRepository.findByUsernameOrEmail(identifier)
-                .orElseThrow(() -> new RuntimeException("User not found: " + identifier)));
+                        .orElseThrow(() -> new RuntimeException("User not found: " + identifier)));
     }
 
     @PostMapping
     public ResponseEntity<?> saveVoiceNote(
-            @RequestParam("title") String title,
-            @RequestParam(value = "tag", defaultValue = "MOTIVATIONAL") String tagStr,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "tag", required = false) String tagStr,
+            @RequestParam(value = "contextTag", required = false) String contextTagStr,
             @RequestParam(value = "transcript", required = false) String userTranscript,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+            @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        User user = getAuthenticatedUser();
-
-        Tag tagEnum;
         try {
-            tagEnum = Tag.valueOf(tagStr.toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            tagEnum = Tag.MOTIVATIONAL;
+            User user = getAuthenticatedUser();
+
+            // Default title if missing
+            if (title == null || title.isBlank()) {
+                title = "Voice Note " + LocalDateTime.now().toString().substring(0, 16).replace("T", " ");
+            }
+
+            // Determine tag from either 'tag' or 'contextTag'
+            String selectedTagStr = (tagStr != null && !tagStr.isBlank()) ? tagStr : contextTagStr;
+            Tag tagEnum;
+            try {
+                tagEnum = (selectedTagStr != null) ? Tag.valueOf(selectedTagStr.toUpperCase()) : Tag.MOTIVATIONAL;
+            } catch (IllegalArgumentException | NullPointerException e) {
+                tagEnum = Tag.MOTIVATIONAL;
+            }
+
+            String finalTranscript = "";
+
+            // 1. Prioritize transcript entered manually on frontend
+            if (userTranscript != null && !userTranscript.trim().isEmpty()) {
+                finalTranscript = userTranscript.trim();
+            }
+            // 2. Fall back to backend AssemblyAI transcription if audio file is provided
+            else if (file != null && !file.isEmpty() && assemblyApiKey != null && !assemblyApiKey.isBlank() && !"dummy_assemblyai_key".equals(assemblyApiKey.trim())) {
+                finalTranscript = transcribeWithAssemblyAI(file.getBytes());
+            }
+
+            // 3. Fallback string if all transcription attempts remain empty
+            if (finalTranscript.isBlank()) {
+                finalTranscript = "No transcript captured for this voice note.";
+            }
+
+            String audioData = null;
+            if (file != null && !file.isEmpty()) {
+                String contentType = file.getContentType() != null ? file.getContentType() : "audio/webm";
+                audioData = "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(file.getBytes());
+            }
+
+            // Build entity using Lombok Builder
+            VoiceNote note = VoiceNote.builder()
+                    .title(title)
+                    .tag(tagEnum)
+                    .user(user)
+                    .createdAt(LocalDateTime.now())
+                    .transcript(finalTranscript)
+                    .audioUrl(audioData)
+                    .build();
+
+            voiceNoteRepository.save(note);
+            return ResponseEntity.ok(Map.of("message", "Voice note saved successfully"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Internal Server Error"));
         }
-
-        VoiceNote note = new VoiceNote();
-        note.setTitle(title);
-        note.setTag(tagEnum);
-        note.setUser(user);
-        note.setCreatedAt(LocalDateTime.now());
-
-        String finalTranscript = "";
-
-        // 1. Prioritize transcript entered manually on frontend
-        if (userTranscript != null && !userTranscript.trim().isEmpty()) {
-            finalTranscript = userTranscript.trim();
-        } 
-        // 2. Fall back to backend AssemblyAI transcription if audio file is provided
-        else if (file != null && !file.isEmpty() && assemblyApiKey != null && !assemblyApiKey.isBlank() && !"dummy_assemblyai_key".equals(assemblyApiKey.trim())) {
-            finalTranscript = transcribeWithAssemblyAI(file.getBytes());
-        }
-
-        // 3. Fallback string if all transcription attempts remain empty
-        if (finalTranscript.isBlank()) {
-            finalTranscript = "No transcript captured for this voice note.";
-        }
-
-        note.setTranscript(finalTranscript);
-
-        if (file != null && !file.isEmpty()) {
-            String contentType = file.getContentType() != null ? file.getContentType() : "audio/webm";
-            String audioData = "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(file.getBytes());
-            note.setAudioUrl(audioData);
-        }
-
-        voiceNoteRepository.save(note);
-        return ResponseEntity.ok(Map.of("message", "Voice note saved successfully"));
     }
 
     @GetMapping

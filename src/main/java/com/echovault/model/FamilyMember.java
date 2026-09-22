@@ -24,6 +24,7 @@ public class FamilyMember {
     private String relationship;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "permission_level", columnDefinition = "VARCHAR(255)")
     private PermissionLevel permissionLevel;
 
     public enum PermissionLevel {

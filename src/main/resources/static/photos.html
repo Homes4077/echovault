@@ -4,305 +4,484 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Upload Photos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131b2e;
-            --border-color: #1e293b;
-            --primary-blue: #0084ff;
-            --primary-hover: #0066cc;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --error-bg: rgba(239, 68, 68, 0.15);
-            --error-border: #ef4444;
-            --success-bg: rgba(16, 185, 129, 0.15);
-            --success-border: #10b981;
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
             min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button, input, select, textarea { cursor: none; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 3px;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            color: #ffffff;
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
         }
 
-        nav a {
-            color: var(--text-muted);
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .brand-link {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.3rem;
+            color: var(--candle);
             text-decoration: none;
-            margin-left: 15px;
+            letter-spacing: 0.03em;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .nav-links { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .nav-links a {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+            text-decoration: none;
+            transition: color 0.25s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--candle); }
+        .nav-back {
+            display: flex; align-items: center; gap: 7px;
+            padding-right: 20px;
+            margin-right: 4px;
+            border-right: 1px solid rgba(200,184,216,0.14);
+            color: var(--petal) !important;
+        }
+        .nav-back:hover { color: var(--candle) !important; }
+
+        /* ── LAYOUT ── */
+        .page-main { max-width: 720px; margin: 0 auto; padding: 56px 40px 80px; }
+
+        .page-kicker {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 8px;
+        }
+        .page-title {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.7rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+        .page-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
             font-size: 0.95rem;
-            transition: color 0.2s;
+            color: var(--petal);
+            margin-bottom: 34px;
+            max-width: 480px;
         }
 
-        nav a:hover, nav a.active {
-            color: var(--primary-blue);
-        }
-
+        /* ── UPLOAD CARD ── */
         .upload-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 24px;
-            margin-bottom: 30px;
+            position: relative;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.12);
+            padding: 40px 36px 34px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+        }
+        .upload-card::before {
+            content: 'New Memory';
+            position: absolute;
+            top: -10px; left: 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: var(--midnight);
+            padding: 0 10px;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
         label {
             display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: 500;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 9px;
         }
 
-        input[type="text"],
-        select,
-        textarea {
+        input[type="text"], select, textarea {
             width: 100%;
-            padding: 10px 12px;
-            background-color: #070a10;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.95rem;
+            padding: 12px 16px;
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid rgba(200,184,216,0.16);
+            color: var(--warm);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
             outline: none;
+            transition: border-color 0.25s, background-color 0.25s;
         }
+        input[type="text"]::placeholder, textarea::placeholder { color: rgba(140,132,160,0.5); }
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: var(--candle);
+            background-color: rgba(244,201,122,0.04);
+        }
+        textarea { resize: vertical; min-height: 76px; font-family: 'Cormorant Garamond', serif; font-style: italic; }
 
-        input[type="text"]:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary-blue);
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23F4C97A' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 10px 7px;
+            padding-right: 42px;
         }
+        select option { background-color: var(--deep); color: var(--warm); }
 
         input[type="file"] {
             width: 100%;
-            padding: 10px;
-            background-color: #070a10;
-            border: 1px dashed var(--border-color);
-            border-radius: 6px;
-            color: var(--text-muted);
-            cursor: pointer;
+            padding: 14px 16px;
+            background-color: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(244,201,122,0.3);
+            color: var(--mist);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.92rem;
+            transition: all 0.25s;
         }
+        input[type="file"]:hover { border-color: var(--candle); background-color: rgba(244,201,122,0.04); }
+        input[type="file"]::file-selector-button {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.3);
+            padding: 8px 14px;
+            margin-right: 14px;
+            transition: all 0.2s;
+        }
+        input[type="file"]::file-selector-button:hover { background: var(--candle); color: var(--midnight); }
+        input[type="file"]::-webkit-file-upload-button {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.3);
+            padding: 8px 14px;
+            margin-right: 14px;
+            transition: all 0.2s;
+        }
+        input[type="file"]::-webkit-file-upload-button:hover { background: var(--candle); color: var(--midnight); }
 
         .btn-submit {
             width: 100%;
-            padding: 12px;
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+            padding: 15px;
+            background-color: transparent;
+            color: var(--candle);
+            border: 1px solid rgba(244,201,122,0.4);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            margin-top: 6px;
         }
-
-        .btn-submit:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-submit:disabled {
-            background-color: #334155;
-            cursor: not-allowed;
-        }
+        .btn-submit:hover { background-color: var(--candle); color: var(--midnight); }
+        .btn-submit:disabled { background-color: transparent; border-color: rgba(200,184,216,0.15); color: var(--mist); cursor: not-allowed; }
 
         .alert {
             display: none;
             padding: 12px 16px;
-            border-radius: 6px;
             font-size: 0.9rem;
-            margin-top: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            margin-top: 18px;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .alert-error { background-color: rgba(193,123,138,0.1); color: var(--rose); border-color: rgba(193,123,138,0.35); }
+        .alert-success { background-color: rgba(244,201,122,0.1); color: var(--candle); border-color: rgba(244,201,122,0.35); }
+
+        @media (max-width: 640px) {
+            .topnav { padding: 16px 20px; }
+            .page-main { padding: 40px 20px 60px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .upload-card { padding: 32px 22px 26px; }
         }
 
-        .alert-error {
-            background-color: var(--error-bg);
-            border: 1px solid var(--error-border);
-            color: #fca5a5;
-        }
-
-        .alert-success {
-            background-color: var(--success-bg);
-            border: 1px solid var(--success-border);
-            color: #6ee7b7;
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, input, select, textarea { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>EchoVault Photos</h1>
-            <nav>
-                <a href="vault.html">Vault</a>
-                <a href="write-letter.html">Write Letter</a>
-                <a href="photos.html" class="active">Upload Photos</a>
-                <a href="memorial.html">Memorial Wall</a>
-            </nav>
-        </header>
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
 
-        <main>
-            <div class="upload-card">
-                <form id="uploadForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" id="title" name="title" placeholder="e.g. Summer Vacation" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="category">Category</label>
-                            <select id="category" name="category">
-                                <option value="GENERAL">GENERAL</option>
-                                <option value="PERSONAL">PERSONAL</option>
-                                <option value="MOTIVATIONAL">MOTIVATIONAL</option>
-                                <option value="FAMILY">FAMILY</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="caption">Caption</label>
-                        <textarea id="caption" name="caption" rows="2" placeholder="Write a short description or memory..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="files">Select Image File(s)</label>
-                        <input type="file" id="files" name="files" accept="image/*" multiple required>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-submit">Upload Photos</button>
-                </form>
-
-                <div id="alertBox" class="alert"></div>
-            </div>
-        </main>
+<nav class="topnav">
+    <a href="/dashboard.html" class="brand-link">
+        <i class="fa-solid fa-ribbon"></i> EchoVault
+    </a>
+    <div class="nav-links">
+        <a href="/dashboard.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <a href="/vault.html">Vault</a>
+        <a href="/write-letter.html">Write Letter</a>
+        <a href="/photos.html" class="active">Upload Photos</a>
+        <a href="/memorial.html">Memorial Wall</a>
     </div>
+</nav>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            checkAuthStatus();
-            document.getElementById("uploadForm").addEventListener("submit", handlePhotoUpload);
-        });
+<main class="page-main">
+    <div class="page-kicker">Photo Vault</div>
+    <h1 class="page-title">Upload a Memory</h1>
+    <p class="page-sub">Add a photograph to your vault, with a caption for whoever finds it later.</p>
 
-        function getToken() {
-            return localStorage.getItem("jwtToken") || localStorage.getItem("token");
+    <div class="upload-card">
+        <form id="uploadForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" placeholder="e.g. Summer Vacation" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="GENERAL">GENERAL</option>
+                        <option value="PERSONAL">PERSONAL</option>
+                        <option value="MOTIVATIONAL">MOTIVATIONAL</option>
+                        <option value="FAMILY">FAMILY</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="caption">Caption</label>
+                <textarea id="caption" name="caption" rows="2" placeholder="Write a short description or memory..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="files">Select Image File(s)</label>
+                <input type="file" id="files" name="files" accept="image/*" multiple required>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-submit">Upload Photos</button>
+        </form>
+
+        <div id="alertBox" class="alert"></div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        checkAuthStatus();
+        document.getElementById("uploadForm").addEventListener("submit", handlePhotoUpload);
+    });
+
+    function getToken() {
+        return localStorage.getItem("jwtToken") || localStorage.getItem("token");
+    }
+
+    function checkAuthStatus() {
+        const token = getToken();
+        if (!token) {
+            showAlert("Please log in to upload photographs.", "error");
+            document.getElementById("submitBtn").disabled = true;
+        }
+    }
+
+    async function handlePhotoUpload(event) {
+        event.preventDefault();
+
+        const token = getToken();
+        if (!token) {
+            showAlert("Access Denied (401): Please log in first.", "error");
+            window.location.href = "/login.html";
+            return;
         }
 
-        function checkAuthStatus() {
-            const token = getToken();
-            if (!token) {
-                showAlert("Please log in to upload photographs.", "error");
-                document.getElementById("submitBtn").disabled = true;
-            }
+        const fileInput = document.getElementById("files");
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showAlert("Please select at least one image file.", "error");
+            return;
         }
 
-        async function handlePhotoUpload(event) {
-            event.preventDefault();
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading...";
 
-            const token = getToken();
-            if (!token) {
-                showAlert("Access Denied (401): Please log in first.", "error");
-                window.location.href = "/login.html";
-                return;
-            }
+        const formData = new FormData();
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("files", fileInput.files[i]);
+        }
+        formData.append("title", document.getElementById("title").value);
+        formData.append("category", document.getElementById("category").value);
+        formData.append("caption", document.getElementById("caption").value);
 
-            const fileInput = document.getElementById("files");
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showAlert("Please select at least one image file.", "error");
-                return;
-            }
+        try {
+            const response = await fetch("/api/photos/upload", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                    // Note: Do NOT set "Content-Type" manually when sending FormData
+                },
+                body: formData
+            });
 
-            const submitBtn = document.getElementById("submitBtn");
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Uploading...";
-
-            const formData = new FormData();
-            for (let i = 0; i < fileInput.files.length; i++) {
-                formData.append("files", fileInput.files[i]);
-            }
-            formData.append("title", document.getElementById("title").value);
-            formData.append("category", document.getElementById("category").value);
-            formData.append("caption", document.getElementById("caption").value);
-
-            try {
-                const response = await fetch("/api/photos/upload", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + token
-                        // Note: Do NOT set "Content-Type" manually when sending FormData
-                    },
-                    body: formData
-                });
-
-                if (response.status === 401 || response.status === 403) {
-                    showAlert("Access Denied (401): Session expired or insufficient user privileges.", "error");
-                    setTimeout(() => {
-                        window.location.href = "/login.html";
-                    }, 2000);
-                    return;
-                }
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error || "Failed to upload photograph.");
-                }
-
-                showAlert("Photo uploaded successfully!", "success");
-                document.getElementById("uploadForm").reset();
-
+            if (response.status === 401 || response.status === 403) {
+                showAlert("Access Denied (401): Session expired or insufficient user privileges.", "error");
                 setTimeout(() => {
-                    window.location.href = "/vault.html";
-                }, 1500);
-
-            } catch (error) {
-                console.error("Upload error:", error);
-                showAlert(error.message || "An error occurred while uploading.", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Upload Photos";
+                    window.location.href = "/login.html";
+                }, 2000);
+                return;
             }
-        }
 
-        function showAlert(message, type) {
-            const alertBox = document.getElementById("alertBox");
-            alertBox.innerText = message;
-            alertBox.className = "alert " + (type === "success" ? "alert-success" : "alert-error");
-            alertBox.style.display = "block";
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || "Failed to upload photograph.");
+            }
+
+            showAlert("Photo uploaded successfully!", "success");
+            document.getElementById("uploadForm").reset();
+
+            setTimeout(() => {
+                window.location.href = "/vault.html";
+            }, 1500);
+
+        } catch (error) {
+            console.error("Upload error:", error);
+            showAlert(error.message || "An error occurred while uploading.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Upload Photos";
         }
-    </script>
+    }
+
+    function showAlert(message, type) {
+        const alertBox = document.getElementById("alertBox");
+        alertBox.innerText = message;
+        alertBox.className = "alert " + (type === "success" ? "alert-success" : "alert-error");
+        alertBox.style.display = "block";
+    }
+</script>
+
+<script>
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+        });
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

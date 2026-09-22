@@ -4,161 +4,227 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoVault — Main Vault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131b2e;
-            --border-color: #1e293b;
-            --primary-blue: #0084ff;
-            --primary-hover: #0066cc;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --badge-bg: #1e293b;
-            --status-locked: #3b82f6;
-            --status-unlocked: #10b981;
+            --midnight: #0D0B0E;
+            --deep: #13101A;
+            --dusk: #1E1828;
+            --veil: #2A2238;
+            --ash: #3D3550;
+            --mist: #8C84A0;
+            --petal: #C8B8D8;
+            --candle: #F4C97A;
+            --ember: #E8A44A;
+            --warm: #F9EDD5;
+            --white: #FAF7F2;
+            --rose: #C17B8A;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--midnight);
+            color: var(--warm);
             min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
+        ::selection { background: rgba(244,201,122,0.3); color: var(--midnight); }
+        a, button { cursor: none; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 1px solid var(--candle);
+            outline-offset: 3px;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            color: #ffffff;
+        /* ── CURSOR ── */
+        .cursor {
+            width: 8px; height: 8px;
+            background: var(--candle);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        .cursor-trail {
+            width: 28px; height: 28px;
+            border: 1px solid rgba(244,201,122,0.35);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
         }
 
-        nav a {
-            color: var(--text-muted);
+        /* ── PARTICLES ── */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--candle);
+            border-radius: 50%;
+            opacity: 0;
+            animation: drift var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: var(--op); }
+            90% { opacity: var(--op); }
+            100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+        }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.5;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(200,184,216,0.08);
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .brand-link {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.3rem;
+            color: var(--candle);
             text-decoration: none;
-            margin-left: 15px;
-            font-size: 0.95rem;
-            transition: color 0.2s;
+            letter-spacing: 0.03em;
+            display: flex; align-items: center; gap: 9px;
         }
+        .nav-links { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .nav-links a {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+            text-decoration: none;
+            transition: color 0.25s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--candle); }
+        .nav-back {
+            display: flex; align-items: center; gap: 7px;
+            padding-right: 20px;
+            margin-right: 4px;
+            border-right: 1px solid rgba(200,184,216,0.14);
+            color: var(--petal) !important;
+        }
+        .nav-back:hover { color: var(--candle) !important; }
 
-        nav a:hover, nav a.active {
-            color: var(--primary-blue);
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+        /* ── LAYOUT ── */
+        .vault-main { max-width: 1100px; margin: 0 auto; padding: 56px 40px 80px; }
 
         .section-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 28px;
         }
-
+        .section-kicker {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--candle);
+            margin-bottom: 6px;
+        }
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-family: 'IM Fell English', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--white);
         }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .btn-action {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--candle);
+            background: transparent;
+            border: 1px solid rgba(244,201,122,0.4);
+            padding: 11px 20px;
             text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background 0.2s;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        .btn-action:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: #334155;
-        }
-
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
+        .btn-action:hover { background: var(--candle); color: var(--midnight); }
+        .btn-secondary { border-color: rgba(200,184,216,0.25); color: var(--petal); }
+        .btn-secondary:hover { background: var(--petal); color: var(--midnight); border-color: var(--petal); }
 
         /* Photo Grid */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 24px;
         }
-
         .photo-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.1);
             overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
+            cursor: none;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
-
         .photo-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary-blue);
+            transform: translateY(-4px);
+            border-color: rgba(244,201,122,0.35);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
         }
-
         .photo-card img {
-            width: 100%;
-            height: 200px;
+            width: 100%; height: 200px;
             object-fit: cover;
             display: block;
-            background-color: #070a10;
+            background-color: var(--dusk);
         }
-
-        .photo-card-body {
-            padding: 15px;
-        }
-
+        .photo-card-body { padding: 18px 20px 20px; }
         .photo-category {
             display: inline-block;
-            background: var(--badge-bg);
-            color: var(--primary-blue);
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            color: var(--candle);
+            background: rgba(244,201,122,0.08);
+            border: 1px solid rgba(244,201,122,0.2);
+            padding: 4px 10px;
+            margin-bottom: 10px;
         }
-
         .photo-title {
-            font-size: 1.05rem;
-            font-weight: 600;
+            font-family: 'IM Fell English', serif;
+            font-size: 1.15rem;
+            color: var(--white);
             margin-bottom: 6px;
-            color: #ffffff;
         }
-
         .photo-caption {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.4;
+            font-size: 0.92rem;
+            color: var(--mist);
+            line-height: 1.55;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -169,218 +235,212 @@
         .letters-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+            gap: 24px;
         }
-
         .letter-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 18px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(200,184,216,0.1);
+            padding: 22px 22px 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: border-color 0.2s;
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
-
-        .letter-card:hover {
-            border-color: var(--primary-blue);
-        }
-
+        .letter-card:hover { border-color: rgba(244,201,122,0.3); transform: translateY(-2px); }
         .letter-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 12px;
             margin-bottom: 10px;
         }
-
-        .letter-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
+        .letter-title { font-family: 'IM Fell English', serif; font-size: 1.15rem; color: var(--white); }
         .status-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: #ffffff;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 10px;
             white-space: nowrap;
+            border: 1px solid transparent;
         }
-
-        .badge-locked {
-            background-color: var(--status-locked);
-        }
-
-        .badge-unlocked {
-            background-color: var(--status-unlocked);
-        }
-
-        .letter-recipient {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
+        .badge-locked { color: var(--ember); background: rgba(232,164,74,0.1); border-color: rgba(232,164,74,0.3); }
+        .badge-unlocked { color: var(--candle); background: rgba(244,201,122,0.1); border-color: rgba(244,201,122,0.3); }
+        .letter-recipient { font-size: 0.9rem; color: var(--mist); margin-bottom: 14px; }
+        .letter-recipient strong { color: var(--petal); font-weight: 600; }
         .letter-body {
-            font-size: 0.9rem;
-            color: var(--text-main);
-            background: #0d1322;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--petal);
+            background: rgba(255,255,255,0.03);
+            padding: 14px 16px;
+            border-left: 2px solid var(--candle);
             white-space: pre-wrap;
             max-height: 140px;
             overflow-y: auto;
-            line-height: 1.4;
+            line-height: 1.6;
         }
-
         .letter-locked-msg {
-            font-size: 0.85rem;
-            color: var(--text-muted);
             font-style: italic;
-            background: #0d1322;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px dashed var(--border-color);
+            font-size: 0.9rem;
+            color: var(--mist);
+            background: rgba(255,255,255,0.02);
+            padding: 14px 16px;
+            border: 1px dashed rgba(232,164,74,0.3);
         }
+        .letter-locked-msg strong { color: var(--ember); }
 
         .empty-state, .error-state {
             text-align: center;
-            padding: 50px 20px;
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px dashed var(--border-color);
-            color: var(--text-muted);
+            padding: 60px 24px;
+            background: rgba(255,255,255,0.015);
+            border: 1px dashed rgba(200,184,216,0.15);
+            color: var(--mist);
+            font-style: italic;
+            font-size: 1rem;
         }
+        .error-state p { color: var(--rose) !important; font-style: normal; }
+        .empty-state .btn-action, .error-state .btn-action { margin-top: 8px; display: inline-flex; }
 
         /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
+            inset: 0;
+            background: rgba(13,11,14,0.92);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            cursor: none;
         }
-
         .modal-content {
             max-width: 90%;
             max-height: 85vh;
-            border-radius: 8px;
+            border: 1px solid rgba(244,201,122,0.25);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
             overflow: hidden;
         }
+        .modal-content img { width: 100%; max-height: 75vh; object-fit: contain; display: block; background: var(--dusk); }
+        .modal-caption { background: var(--deep); padding: 18px 22px; text-align: center; }
+        .modal-caption h3 { font-family: 'IM Fell English', serif; color: var(--white); font-size: 1.2rem; margin-bottom: 6px; }
+        .modal-caption p { color: var(--petal); font-style: italic; font-size: 0.9rem; }
 
-        .modal-content img {
-            width: 100%;
-            max-height: 75vh;
-            object-fit: contain;
-            display: block;
+        @media (max-width: 640px) {
+            .topnav { padding: 16px 20px; }
+            .vault-main { padding: 40px 20px 60px; }
         }
 
-        .modal-caption {
-            background: var(--card-bg);
-            padding: 15px;
-            text-align: center;
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            body { cursor: auto; }
+            a, button, .photo-card, .modal { cursor: auto; }
+            .cursor, .cursor-trail, .particles { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>EchoVault</h1>
-            <nav>
-                <a href="vault.html" class="active">Vault</a>
-                <a href="write-letter.html">Write Letter</a>
-                <a href="photos.html">Upload Photos</a>
-                <a href="memorial.html">Memorial Wall</a>
-            </nav>
-        </header>
+<div class="cursor" id="cur"></div>
+<div class="cursor-trail" id="trail"></div>
+<div class="particles" id="particles"></div>
 
-        <main>
-            <!-- Photos Section -->
-            <div class="section-header">
-                <h2 class="section-title">Photographic Memories</h2>
-                <div class="action-buttons">
-                    <a href="photos.html" class="btn-action">+ Add Photo</a>
-                </div>
-            </div>
-
-            <div id="vaultPhotoGrid" class="photo-grid">
-                <div class="empty-state">Loading vault photographs...</div>
-            </div>
-
-            <!-- Letters Section -->
-            <div class="section-header" style="margin-top: 50px;">
-                <h2 class="section-title">Time-Locked Letters</h2>
-                <div class="action-buttons">
-                    <a href="write-letter.html" class="btn-action btn-secondary">✉️ Write Letter</a>
-                </div>
-            </div>
-
-            <div id="vaultLetterGrid" class="letters-grid">
-                <div class="empty-state">Loading time-locked letters...</div>
-            </div>
-        </main>
+<nav class="topnav">
+    <a href="/dashboard.html" class="brand-link">
+        <i class="fa-solid fa-ribbon"></i> EchoVault
+    </a>
+    <div class="nav-links">
+        <a href="/dashboard.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <a href="/vault.html" class="active">Vault</a>
+        <a href="/write-letter.html">Write Letter</a>
+        <a href="/photos.html">Upload Photos</a>
+        <a href="/memorial.html">Memorial Wall</a>
     </div>
+</nav>
 
-    <!-- Image Modal -->
-    <div id="imageModal" class="modal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <img id="modalImg" src="" alt="Full Preview">
-            <div class="modal-caption">
-                <h3 id="modalTitle"></h3>
-                <p id="modalDesc"></p>
-            </div>
+<main class="vault-main">
+    <!-- Photos Section -->
+    <div class="section-header">
+        <div>
+            <div class="section-kicker">Vault Contents</div>
+            <h2 class="section-title">Photographic Memories</h2>
+        </div>
+        <div class="action-buttons">
+            <a href="/photos.html" class="btn-action">+ Add Photo</a>
         </div>
     </div>
 
-    <script>
-        async function fetchVaultPhotos() {
-            const grid = document.getElementById('vaultPhotoGrid');
-            const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
+    <div id="vaultPhotoGrid" class="photo-grid">
+        <div class="empty-state">Loading vault photographs...</div>
+    </div>
 
-            if (!token) {
+    <!-- Letters Section -->
+    <div class="section-header" style="margin-top: 60px;">
+        <div>
+            <div class="section-kicker">Sealed & Delivered</div>
+            <h2 class="section-title">Time-Locked Letters</h2>
+        </div>
+        <div class="action-buttons">
+            <a href="/write-letter.html" class="btn-action btn-secondary">✉️ Write Letter</a>
+        </div>
+    </div>
+
+    <div id="vaultLetterGrid" class="letters-grid">
+        <div class="empty-state">Loading time-locked letters...</div>
+    </div>
+</main>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <img id="modalImg" src="" alt="Full Preview">
+        <div class="modal-caption">
+            <h3 id="modalTitle"></h3>
+            <p id="modalDesc"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchVaultPhotos() {
+        const grid = document.getElementById('vaultPhotoGrid');
+        const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        const headers = { 'Authorization': 'Bearer ' + token };
+
+        try {
+            const response = await fetch('/api/photos', { headers: headers });
+
+            if (response.status === 401 || response.status === 403) {
                 window.location.href = '/login.html';
                 return;
             }
 
-            const headers = { 'Authorization': 'Bearer ' + token };
+            if (!response.ok) throw new Error('Failed to load photos');
 
-            try {
-                const response = await fetch('/api/photos', { headers: headers });
-                
-                if (response.status === 401 || response.status === 403) {
-                    window.location.href = '/login.html';
-                    return;
-                }
+            const photos = await response.json();
 
-                if (!response.ok) throw new Error('Failed to load photos');
-
-                const photos = await response.json();
-
-                if (!photos || photos.length === 0) {
-                    grid.innerHTML = `
+            if (!photos || photos.length === 0) {
+                grid.innerHTML = `
                         <div class="empty-state" style="grid-column: 1 / -1;">
                             <p>No photographs found in your personal vault.</p>
                             <br>
-                            <a href="photos.html" class="btn-action">Upload Your First Photo</a>
+                            <a href="/photos.html" class="btn-action">Upload Your First Photo</a>
                         </div>`;
-                    return;
-                }
+                return;
+            }
 
-                grid.innerHTML = photos.map(photo => `
-                    <div class="photo-card" 
-                         data-url="${photo.imageUrl}" 
-                         data-title="${escapeAttr(photo.title)}" 
-                         data-caption="${escapeAttr(photo.caption)}" 
+            grid.innerHTML = photos.map(photo => `
+                    <div class="photo-card"
+                         data-url="${photo.imageUrl}"
+                         data-title="${escapeAttr(photo.title)}"
+                         data-caption="${escapeAttr(photo.caption)}"
                          onclick="openModalFromElement(this)">
                         <img src="${photo.imageUrl}" alt="${escapeAttr(photo.title || 'Vault Photo')}" loading="lazy" />
                         <div class="photo-card-body">
@@ -391,49 +451,49 @@
                     </div>
                 `).join('');
 
-            } catch (err) {
-                console.error('Error loading photos:', err);
-                grid.innerHTML = `
+        } catch (err) {
+            console.error('Error loading photos:', err);
+            grid.innerHTML = `
                     <div class="error-state" style="grid-column: 1 / -1;">
-                        <p style="color: #ef4444;">Unable to load photos.</p>
+                        <p>Unable to load photos.</p>
                     </div>`;
-            }
         }
+    }
 
-        async function fetchVaultLetters() {
-            const grid = document.getElementById('vaultLetterGrid');
-            const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
+    async function fetchVaultLetters() {
+        const grid = document.getElementById('vaultLetterGrid');
+        const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
 
-            if (!token) return;
+        if (!token) return;
 
-            const headers = { 'Authorization': 'Bearer ' + token };
+        const headers = { 'Authorization': 'Bearer ' + token };
 
-            try {
-                const response = await fetch('/api/letters', { headers: headers });
+        try {
+            const response = await fetch('/api/letters', { headers: headers });
 
-                if (!response.ok) throw new Error('Failed to load letters');
+            if (!response.ok) throw new Error('Failed to load letters');
 
-                const letters = await response.json();
+            const letters = await response.json();
 
-                if (!letters || letters.length === 0) {
-                    grid.innerHTML = `
+            if (!letters || letters.length === 0) {
+                grid.innerHTML = `
                         <div class="empty-state" style="grid-column: 1 / -1;">
                             <p>No time-locked letters found in your vault.</p>
                             <br>
-                            <a href="write-letter.html" class="btn-action">Schedule Your First Letter</a>
+                            <a href="/write-letter.html" class="btn-action">Schedule Your First Letter</a>
                         </div>`;
-                    return;
-                }
+                return;
+            }
 
-                const now = new Date();
+            const now = new Date();
 
-                grid.innerHTML = letters.map(letter => {
-                    const scheduledTime = letter.scheduledDeliveryAt ? new Date(letter.scheduledDeliveryAt) : null;
-                    const isDelivered = letter.delivered || (scheduledTime && scheduledTime <= now);
-                    const formattedDate = scheduledTime ? scheduledTime.toLocaleString() : 'Immediate';
-                    const contentText = letter.bodyContent || letter.content || '';
+            grid.innerHTML = letters.map(letter => {
+                const scheduledTime = letter.scheduledDeliveryAt ? new Date(letter.scheduledDeliveryAt) : null;
+                const isDelivered = letter.delivered || (scheduledTime && scheduledTime <= now);
+                const formattedDate = scheduledTime ? scheduledTime.toLocaleString() : 'Immediate';
+                const contentText = letter.bodyContent || letter.content || '';
 
-                    return `
+                return `
                         <div class="letter-card">
                             <div>
                                 <div class="letter-card-header">
@@ -443,63 +503,92 @@
                                     </span>
                                 </div>
                                 <div class="letter-recipient">
-                                    To: <strong>${escapeHtml(letter.recipientName || 'Recipient')}</strong> 
+                                    To: <strong>${escapeHtml(letter.recipientName || 'Recipient')}</strong>
                                     (${escapeHtml(letter.recipientEmail || 'No email')})
                                 </div>
                                 <div style="margin-bottom: 12px;">
                                     <span class="photo-category">${escapeHtml(letter.tag || 'GENERAL')}</span>
                                 </div>
-                                ${isDelivered 
-                                    ? `<div class="letter-body">${escapeHtml(contentText)}</div>` 
-                                    : `<div class="letter-locked-msg">🔒 Message content is locked until release on <strong>${formattedDate}</strong>.</div>`
-                                }
+                                ${isDelivered
+                    ? `<div class="letter-body">${escapeHtml(contentText)}</div>`
+                    : `<div class="letter-locked-msg">🔒 Message content is locked until release on <strong>${formattedDate}</strong>.</div>`
+                }
                             </div>
                         </div>
                     `;
-                }).join('');
+            }).join('');
 
-            } catch (err) {
-                console.error('Error loading letters:', err);
-                grid.innerHTML = `
+        } catch (err) {
+            console.error('Error loading letters:', err);
+            grid.innerHTML = `
                     <div class="error-state" style="grid-column: 1 / -1;">
-                        <p style="color: #ef4444;">Unable to load letters. Please try again later.</p>
+                        <p>Unable to load letters. Please try again later.</p>
                     </div>`;
-            }
         }
+    }
 
-        function openModalFromElement(el) {
-            document.getElementById('modalImg').src = el.getAttribute('data-url');
-            document.getElementById('modalTitle').innerText = el.getAttribute('data-title') || 'Untitled';
-            document.getElementById('modalDesc').innerText = el.getAttribute('data-caption') || '';
-            document.getElementById('imageModal').style.display = 'flex';
-        }
+    function openModalFromElement(el) {
+        document.getElementById('modalImg').src = el.getAttribute('data-url');
+        document.getElementById('modalTitle').innerText = el.getAttribute('data-title') || 'Untitled';
+        document.getElementById('modalDesc').innerText = el.getAttribute('data-caption') || '';
+        document.getElementById('imageModal').style.display = 'flex';
+    }
 
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
+    function closeModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
 
-        function escapeAttr(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+    function escapeAttr(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchVaultPhotos();
-            fetchVaultLetters();
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchVaultPhotos();
+        fetchVaultLetters();
+    });
+</script>
+
+<script>
+    /*
+     * DECORATIVE LAYER — cursor, trail, ambient particles.
+     * Skipped automatically when the user prefers reduced motion.
+     */
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const cur = document.getElementById('cur');
+        const trail = document.getElementById('trail');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
         });
-    </script>
+        (function animTrail() {
+            tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1;
+            trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+            requestAnimationFrame(animTrail);
+        })();
+
+        const pc = document.getElementById('particles');
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `left:${Math.random() * 100}%;--dur:${8 + Math.random() * 12}s;--delay:${Math.random() * 10}s;--op:${0.2 + Math.random() * 0.4};--dx:${(Math.random() - 0.5) * 60}px;`;
+            pc.appendChild(p);
+        }
+    }
+</script>
 </body>
 </html>

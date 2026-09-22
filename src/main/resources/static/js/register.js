@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullName = document.getElementById('fullName').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        const requestAdmin = document.getElementById('requestAdmin')?.checked;
 
         if (password.length < 6) {
             showAlert('Registration failed: Password must be at least 6 characters.', 'error');
@@ -24,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fullName: fullName,
             email: email,
             password: password,
-            role: requestAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'
+            role: 'ROLE_USER'
         };
 
         if (submitBtn) {
@@ -55,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Ensure clean storage state so user must log in explicitly
             localStorage.removeItem('jwtToken');
 
             showAlert('Account created successfully! Redirecting to login...', 'success');
