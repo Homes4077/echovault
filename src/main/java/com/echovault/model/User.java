@@ -68,6 +68,27 @@ public class User implements UserDetails {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // Explicit Getters to ensure Docker/Maven compiler compatibility
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getSecurityAnswer() {
+        return securityAnswer;
+    }
+
+    public String getSecurityQuestion() {
+        return securityQuestion;
+    }
+
     // Helper method to maintain backwards compatibility with getName() calls
     public String getName() {
         return this.fullName;
