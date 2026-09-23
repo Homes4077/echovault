@@ -15,7 +15,12 @@ public class AuthRequest {
     private String username;
     private String password;
     private String viewMode; // "USER", "FAMILY", or "ADMIN"
-  private String securityAnswer;
+    private String securityAnswer;
+
+    // Explicit getter for security answer
+    public String getSecurityAnswer() {
+        return securityAnswer;
+    }
 
     // Fallback getter if frontend submits 'username' instead of 'email'
     public String getEmail() {
